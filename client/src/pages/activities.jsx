@@ -93,7 +93,7 @@ function ActivitiesPage() {
           </DialogContent>
         </Dialog>
       </div>
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-10">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
         {activities.map((activity, index) => (
           <ActivityCard key={index} activity={activity} />
         ))}
