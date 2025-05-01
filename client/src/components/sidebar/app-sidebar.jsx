@@ -27,17 +27,17 @@ const data = {
     {
       name: "Dashboard",
       url: "/",
-      icon: ChartPie,
+      emoji: "📈"
     },
     {
       name: "Students",
       url: "/students",
-      icon: Users,
+      emoji: "🧒"
     },
     {
       name: "Activities",
       url: "/activities",
-      icon: NotebookText,
+      emoji: "✍️"
     },
   ],
 }

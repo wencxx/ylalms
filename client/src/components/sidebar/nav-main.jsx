@@ -17,12 +17,12 @@ export function NavMain({ items }) {
             to={item.url}
             key={item.name}
             className={({ isActive }) =>
-              isActive ? 'bg-custom-primary rounded-md' : ''
+              isActive ? 'bg-custom-primary rounded-md text-white' : ''
             }
           >
             <SidebarMenuItem>
               <SidebarMenuButton tooltip={item.name}>
-                {item.icon && <item.icon />}
+                {item.emoji && <span>{item.emoji}</span>}
                 <span>{item.name}</span>
               </SidebarMenuButton>
             </SidebarMenuItem>

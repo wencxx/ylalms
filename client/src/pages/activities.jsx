@@ -17,25 +17,46 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-const activities = [
-  {
-    title: "Animals and Sound",
-    type: "matching",
-    items: [1, 2, 3, 4, 5, 6],
-  },
-  {
-    title: "Shapes",
-    type: "dnd",
-    items: [1, 2, 3, 4, 5, 6],
-  },
-];
+import { toast } from "sonner";
+import axios from "axios";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function ActivitiesPage() {
   const navigate = useNavigate();
 
+  // get all activities
+  const [activities, setActivities] = useState([])
+  const [fetching, setFetching] = useState(false)
+
+  const getActivities = async () => {
+    try {
+      setFetching(true)
+      const res = await axios.get(`${import.meta.env.VITE_ENDPOINT}api/activity/get`, {
+        validateStatus: status => status < 500
+      })
+
+      if(res.status === 200){
+        setActivities(res.data)
+      }else{
+        setActivities([])
+      }
+    } catch (error) {
+      toast.error('Server error', {
+        description: 'Failed fetching activities, please try again later.'
+      })
+    } finally {
+      setFetching(false)
+    }
+  }
+
+  useEffect(() => {
+    getActivities()
+  }, [])
+
+
+  // add quiz modal and blahblah
   const [selectedQuizType, setSelectedQuizType] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -94,9 +115,17 @@ function ActivitiesPage() {
         </Dialog>
       </div>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
-        {activities.map((activity, index) => (
-          <ActivityCard key={index} activity={activity} />
-        ))}
+        {!fetching ? (
+          activities.length ? (
+            activities.map((activity, index) => (
+              <ActivityCard key={index} activity={activity} />
+            ))
+          ) : (
+            <p className="text-center col-span-full text-gray-500">No activities to show</p>
+          )
+        ) : (
+          <Skeleton className="h-90 rounded-xl" />
+        )}
       </div>
     </>
   );
