@@ -19,8 +19,8 @@ import {
 // This is sample data.
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
+    name: "Wency Baterna",
+    email: "wncbtrn@gmail.com",
     avatar: "/avatars/shadcn.jpg",
   },
   projects: [

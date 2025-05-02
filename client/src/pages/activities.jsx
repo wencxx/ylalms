@@ -13,7 +13,7 @@ import {
 import {
   Select,
   SelectContent,
-  SelectItem,
+  SelectItem, 
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -44,7 +44,8 @@ function ActivitiesPage() {
       }
     } catch (error) {
       toast.error('Server error', {
-        description: 'Failed fetching activities, please try again later.'
+        description: 'Failed fetching activities, please try again later.',
+        descriptionClassName: '!text-neutral-500',
       })
     } finally {
       setFetching(false)
@@ -124,7 +125,7 @@ function ActivitiesPage() {
             <p className="text-center col-span-full text-gray-500">No activities to show</p>
           )
         ) : (
-          <Skeleton className="h-90 rounded-xl" />
+          <Skeleton className="h-60 rounded-xl" />
         )}
       </div>
     </>
