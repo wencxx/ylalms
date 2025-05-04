@@ -1,4 +1,5 @@
 const Activity = require('../models/activities')
+const Answer = require('../models/answers')
 
 exports.add = async (req, res) => {
     if (!req.body) return res.send('No data found')
@@ -41,3 +42,30 @@ exports.getSpecific = async (req, res) => {
         res.status(500).send('Server error')
     }
 }
+
+exports.addAnswer = async (req, res) => {
+    const id = req.id;
+    try {
+        const data = {
+            userId: id,
+            ...req.body
+        };
+
+        const activity = await Activity.findById(req.body.quizId);
+        if (!activity) return res.status(404).send("Activity not found");
+
+        const newAnswer = await Answer.create(data);
+        if (!newAnswer) return res.status(400).send('Failed saving answer');
+
+        await Activity.findByIdAndUpdate(
+            req.body.quizId,
+            { $addToSet: { submittedUser: id } }, 
+            { new: true }
+        );
+
+        res.status(200).send('Answer saved successfully');
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Server error');
+    }
+};

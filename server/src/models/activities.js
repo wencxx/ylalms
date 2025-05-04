@@ -12,7 +12,13 @@ const activitySchema = new mongoose.Schema({
     activityType: {
         type: String,
         required: true
-    }
+    },
+    submittedUser: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+        }
+    ]
 }, {
     timestamps: true,
     strict: false

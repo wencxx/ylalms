@@ -22,13 +22,13 @@ exports.add = async (req, res) => {
         const newUser = await User.create(userData)
 
         if(newUser){
-            res.status(200).send('Added student successfully')
+            res.status(200).send(newUser)
         }else{
             res.status(400).send('Failed to add student')
         }
     } catch (error) {
         console.log(error)
-        res.sent(error)
+        res.send(error)
     }
 }
 
@@ -43,7 +43,7 @@ exports.login = async (req, res) => {
 
         const isMatch = await bcrypt.compare(password, existingUser.password)
 
-        if(!isMatch) return res.status(400).send('Invalid password')
+        if(!isMatch) return res.status(401).send('Invalid password')
 
         const token = jwt.sign({ id: existingUser._id, usename: existingUser.username }, process.env.SECRET_KEY)
 
@@ -67,6 +67,21 @@ exports.getUser = async (req, res) => {
         if(!userData) return res.status(404).send('User not found')
 
         res.status(200).send(userData) 
+    } catch (error) {
+        console.log(error)
+        res.status(500).send('Server error')
+    }
+}
+
+exports.getAllUsers = async (req, res) => {
+    try {
+        const user = await User.find({
+            role: 'student'
+        })
+
+        if(!user.length) return res.status(404).send('Users not found')
+
+        res.status(200).send(user) 
     } catch (error) {
         console.log(error)
         res.status(500).send('Server error')

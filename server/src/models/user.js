@@ -21,12 +21,15 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    suffix: {
+        type: String,
+    },
     gender: {
         type: String,
         required: true
     },
     birthday: {
-        type: String,
+        type: Date,
         required: true
     },
     address: {
@@ -40,6 +43,11 @@ const userSchema = new mongoose.Schema({
     guardianContact: {
         type: String,
         required: true
+    },
+    role: {
+        type: String,
+        required: true,
+        default: 'student'
     },
 }, {
     timestamps: true
