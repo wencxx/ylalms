@@ -1,5 +1,5 @@
 import { CardContent } from "../ui/card";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DndContext, useDraggable, useDroppable } from "@dnd-kit/core";
 
 const generateDraggables = (items) =>
@@ -11,9 +11,13 @@ const generateDraggables = (items) =>
     }))
   );
 
-export default function DndQuiz({ data, setScore, colors }) {
+export default function DndQuiz({ data, setScore, colors, setItems }) {
   const [draggables] = useState(generateDraggables(data.items));
   const [droppedItems, setDroppedItems] = useState({});
+
+  useEffect(() => {
+    setItems(draggables.length)
+  }, [draggables])
 
   const [containers, setContainers] = useState(
     data.items.map((item) => item.container)
@@ -83,7 +87,13 @@ function DraggableItem({ id, label }) {
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...listeners} {...attributes} className="bg-rose-500">
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...listeners}
+      {...attributes}
+      className="bg-rose-500"
+    >
       {label}
     </div>
   );
@@ -96,11 +106,11 @@ function DroppableZone({ id, label, droppedItems, draggables, colors }) {
     .filter(([, target]) => target === id)
     .map(([itemId]) => itemId);
 
-    const backgroundColor  = useMemo(() => {
-        const randomIndex = Math.floor(Math.random() * colors.length)
+  const backgroundColor = useMemo(() => {
+    const randomIndex = Math.floor(Math.random() * colors.length);
 
-        return colors[randomIndex]
-    }, [id])
+    return colors[randomIndex];
+  }, [id]);
 
   return (
     <div

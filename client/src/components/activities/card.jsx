@@ -6,7 +6,8 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/auth-provider";
 
 const colors = {
   matching: "bg-blue-300",
@@ -16,10 +17,20 @@ const colors = {
 };
 
 function ActivityCard({ activity }) {
+  const { currentUser } = useAuth();
+  
+  const navigate = useNavigate()
+
+  const takeQuiz = (quizId) => {
+    navigate(`/quiz/${quizId}`)
+  }
+
   return (
     <>
       <Card
-        className={`text-white ${colors[activity.activityType]} dark:bg-neutral-600`}
+        className={`text-white ${
+          colors[activity.activityType]
+        } dark:bg-neutral-600`}
       >
         <CardHeader>
           <Badge
@@ -37,9 +48,14 @@ function ActivityCard({ activity }) {
           <p className="text-gray-100">{activity.activityDescription}</p>
         </CardContent>
         <CardFooter>
-          <Link to={`/quiz/${activity._id}`} className="w-full">
-            <Button className="w-full cursor-pointer">Take Quiz</Button>
-          </Link>
+          <Button
+            className="w-full cursor-pointer"
+            disabled={activity.submittedUser.includes(currentUser._id)}
+            onClick={() => takeQuiz(activity._id)}
+            variant={activity.submittedUser.includes(currentUser._id) ?'sky' : 'default'}
+          >
+            {activity.submittedUser.includes(currentUser._id) ? 'Completed' : 'Take Quiz'}
+          </Button>
         </CardFooter>
       </Card>
     </>

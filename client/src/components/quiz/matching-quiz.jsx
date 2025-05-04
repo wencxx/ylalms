@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react"
 import { CardContent } from "../ui/card"
 
-export default function MatchingQuiz({ data, setScore }) {
+export default function MatchingQuiz({ data, setScore, setItems }) {
   const [leftItems, setLeftItems] = useState([])
   const [rightItems, setRightItems] = useState([])
   const [selectedLeft, setSelectedLeft] = useState(null)
@@ -15,6 +15,7 @@ export default function MatchingQuiz({ data, setScore }) {
 
   useEffect(() => {
     resetGame()
+    setItems(data.length)
   }, [])
 
   // Handle selection of left item
@@ -117,8 +118,8 @@ export default function MatchingQuiz({ data, setScore }) {
   }
 
   return (
-    <CardContent className="">
-      <div className="relative flex justify-between min-h-[400px] mb-6" ref={containerRef}>
+    <CardContent>
+      <div className="relative flex justify-between h-fit mb-6" ref={containerRef}>
         {/* lep kolom */}
         <div className="flex flex-col gap-4 w-2/5">
           {leftItems.map((item) => (
@@ -164,12 +165,12 @@ export default function MatchingQuiz({ data, setScore }) {
         {/* the greaaaaaat line HAHA */}
         <svg className="absolute top-0 left-0 w-full h-full pointer-events-none z-10">{renderLines()}</svg>
       </div>
-      <button
+      {/* <button
         className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded transition-colors"
         onClick={resetGame}
       >
         Reset Game
-      </button>
+      </button> */}
     </CardContent>
   )
 }

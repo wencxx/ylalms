@@ -56,6 +56,9 @@ function AddMatching() {
         `${import.meta.env.VITE_ENDPOINT}api/activity/add`,
         newActivity,
         {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
           validateStatus: (status) => status < 500,
         }
       );

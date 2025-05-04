@@ -1,11 +1,19 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import DndQuiz from "@/components/quiz/dnd-quiz";
 import MatchingQuiz from "@/components/quiz/matching-quiz";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/components/auth/auth-provider";
+import { QuizResultDialog } from '@/components/quiz-result-dialog'
 
 const colors = [
   "bg-orange-400",
@@ -27,8 +35,12 @@ const colors = [
 
 export default function TakeQuizPage() {
   const { id } = useParams();
+  const { currentUser } = useAuth();
+
+  const navigate = useNavigate()
 
   const [score, setScore] = useState(0);
+  const [items, setItems] = useState(0);
 
   // get activity
   const [activity, setActivity] = useState(null);
@@ -40,6 +52,9 @@ export default function TakeQuizPage() {
       const res = await axios.get(
         `${import.meta.env.VITE_ENDPOINT}api/activity/get/${id}`,
         {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
           validateStatus: (status) => status < 500,
         }
       );
@@ -62,6 +77,62 @@ export default function TakeQuizPage() {
     getActivity();
   }, []);
 
+  useEffect(() => {
+    if(activity){
+      if(activity.submittedUser.includes(currentUser._id)){
+        toast.warning("You already taken this quiz.")
+        navigate('/activities')
+      }
+    }
+  }, [activity])
+
+  // submit quiz
+  const [showPassDialog, setShowPassDialog] = useState(false)
+  const [showFailDialog, setShowFailDialog] = useState(false)
+  const [submitting, setSubmitting] = useState(false);
+
+  const submitQuiz = async () => {
+    const data = {
+      quizId: activity._id,
+      score,
+    };
+
+    try {
+      setSubmitting(true);
+      const res = await axios.post(
+        `${import.meta.env.VITE_ENDPOINT}api/activity/add-answer`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          validateStatus: (status) => status < 500,
+        }
+      );
+
+      if (res.status === 200) {
+        if(score >= (0.75 * items)){
+          setShowPassDialog(true)
+        }else{
+          setShowFailDialog(true)
+        }
+      } else {
+        toast.error("Failed submitting quiz", {
+          description: "Please try again later.",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed submitting quiz", {
+        description: "Please try again later.",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+
+    console.log(data);
+  };
+
   return (
     <>
       {!fetching ? (
@@ -74,10 +145,19 @@ export default function TakeQuizPage() {
               <p className="text-gray-700">{activity.activityDescription}</p>
             </CardHeader>
             {activity.activityType === "dnd" ? (
-              <DndQuiz data={activity} setScore={setScore} colors={colors} />
+              <DndQuiz data={activity} setScore={setScore} colors={colors} setItems={setItems} />
             ) : (
-              <MatchingQuiz data={activity.items} setScore={setScore} />
+              <MatchingQuiz data={activity.items} setScore={setScore} setItems={setItems} />
             )}
+            <CardFooter className="flex justify-end">
+              <Button
+                onClick={() => submitQuiz()}
+                disabled={submitting}
+                className={`${submitting && "animate-pulse"}`}
+              >
+                {submitting ? "Submitting Quiz" : "Submit Quiz"}
+              </Button>
+            </CardFooter>
           </Card>
         )
       ) : (
@@ -89,9 +169,29 @@ export default function TakeQuizPage() {
           </CardHeader>
           <CardContent>
             <Skeleton className="h-96 w-full rounded-xl" />
+            <div className="w-full">
+              <Skeleton className="h-10 w-30 float-end mt-4" />
+            </div>
           </CardContent>
         </Card>
       )}
+
+      {/* dialog for success quiz */}
+      <QuizResultDialog
+        isOpen={showPassDialog}
+        onClose={() => setShowPassDialog(false)}
+        isPassed={true}
+        score={score}
+        totalQuestions={items}
+      />
+
+      <QuizResultDialog
+        isOpen={showFailDialog}
+        onClose={() => setShowFailDialog(false)}
+        isPassed={false}
+        score={score}
+        totalQuestions={items}
+      />
     </>
   );
 }

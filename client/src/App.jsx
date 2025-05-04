@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import LayoutPage from "@/components/layout/layout";
+import ProtectedRoutes from "./components/auth/protected-routes";
 import LoginPage from "@/pages/login";
 import HomePage from "@/pages/home";
 import StudentsPage from "@/pages/students";
@@ -8,7 +9,6 @@ import AddQuizPage from "@/pages/add-activity";
 import TakeQuizPage from "@/pages/take-quiz";
 
 function App() {
-
   const router = createBrowserRouter([
     {
       path: "/login",
@@ -16,7 +16,11 @@ function App() {
     },
     {
       path: "/",
-      element: <LayoutPage />,
+      element: (
+        <ProtectedRoutes allowedRules={['teacher']}>
+          <LayoutPage />
+        </ProtectedRoutes>
+      ),
       children: [
         {
           index: true,
@@ -27,12 +31,22 @@ function App() {
           element: <StudentsPage />,
         },
         {
-          path: "activities",
-          element: <ActivitiesPage />,
-        },
-        {
           path: "add-activity",
           element: <AddQuizPage />,
+        }
+      ],
+    },
+    {
+      path: "/",
+      element: (
+        <ProtectedRoutes allowedRules={['student', 'teacher']}>
+          <LayoutPage />
+        </ProtectedRoutes>
+      ),
+      children: [
+        {
+          path: "activities",
+          element: <ActivitiesPage />,
         },
         {
           path: "quiz/:id",
