@@ -22,6 +22,8 @@ export const AuthProvider = ({ children }) => {
       if (res.status === 401) throw new Error("Invalid username or password");
       if (res.status !== 200) throw new Error("Unexpected error during login");
 
+      console.log(res.data)
+
       localStorage.setItem("token", res.data.token);
       setAuth(true);
       setCurrentUser(res.data);
