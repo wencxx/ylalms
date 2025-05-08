@@ -4,6 +4,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { motion } from "framer-motion"
 import { Sparkles, Star, Trophy, ArrowRight } from "lucide-react"
 import confetti from "canvas-confetti"
+import { Link } from "react-router-dom"
 
 export function QuizResultDialog({ isOpen, onClose, isPassed, score, totalQuestions = 10 }) {
   const [isConfettiShown, setIsConfettiShown] = useState(false)
@@ -111,18 +112,14 @@ export function QuizResultDialog({ isOpen, onClose, isPassed, score, totalQuesti
               </p>
 
               <div className="flex justify-center gap-4">
-                <Button
-                  onClick={onClose}
-                  className="bg-orange-500 hover:bg-orange-600 text-white rounded-full px-6 py-2 text-lg"
-                >
-                  Try Again
-                </Button>
-                <Button
-                  onClick={onClose}
-                  className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-6 py-2 text-lg"
-                >
-                  Review Lesson
-                </Button>
+                <Link to='/activities'>
+                  <Button
+                    onClick={onClose}
+                    className="bg-orange-500 hover:bg-orange-600 text-white rounded-full px-6 py-2 text-lg"
+                  >
+                    Other Activities
+                  </Button>
+                </Link>
               </div>
             </motion.div>
           </div>

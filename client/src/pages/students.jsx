@@ -13,7 +13,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import AddStudent from '@/components/form/add-student-form'
+import AddStudent from "@/components/form/add-student-form";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 export default function StudentsPage() {
   const [students, setStudents] = useState([]);
@@ -64,7 +75,39 @@ export default function StudentsPage() {
   };
 
   // add new student
-  const [openDialog, setOpenDialog] = useState(false)
+  const [openDialog, setOpenDialog] = useState(false);
+
+  // delete student
+  const [showAlertDialog, setShowAlertDialog] = useState(false)
+  const [studentToDelete, setStudentToDelete] = useState(null)
+
+  const deleteStudent = (studentID) => {
+    setShowAlertDialog(true)
+    setStudentToDelete(studentID)
+  }
+
+  const confirmDelete = async () => {
+    try {
+      const res = await axios.delete(`${import.meta.env.VITE_ENDPOINT}api/auth/delete/${studentToDelete}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
+        validateStatus: status => status < 500
+      })
+
+      if(res.status === 200){
+        toast.success('Deleted student successfully.')
+        setStudents((prev) => prev.filter(student => student._id !== studentToDelete))
+      }else{
+        toast.error(res.data)
+      }
+    } catch (error) {
+      
+    } finally {
+      setShowAlertDialog(false)
+      setStudentToDelete(null)
+    }
+  }
 
   return (
     <>
@@ -90,15 +133,18 @@ export default function StudentsPage() {
           />
         </div>
         <div className="flex gap-2 w-full md:w-auto">
-          <Button className="bg-green-500 hover:bg-green-600" onClick={() => setOpenDialog(true)}>
+          <Button
+            className="bg-green-500 hover:bg-green-600"
+            onClick={() => setOpenDialog(true)}
+          >
             Add Student
           </Button>
-          <Button
+          {/* <Button
             variant="outline"
             className="border-purple-300 text-purple-700"
           >
             Export List
-          </Button>
+          </Button> */}
         </div>
       </div>
 
@@ -151,18 +197,18 @@ export default function StudentsPage() {
                   </div>
                 </CardContent>
                 <CardFooter className="bg-purple-50 flex justify-between">
-                  <Button variant="ghost" size="sm" className="text-purple-700">
-                    View Details
-                  </Button>
-                  <Link to={`/students/${student._id}/assignments`}>
+                  <Link to={`/answers/${student._id}`}>
                     <Button
                       variant="ghost"
                       size="sm"
                       className="text-purple-700"
                     >
-                      Activities
+                      View Results
                     </Button>
                   </Link>
+                  <Button variant="ghost" size="sm" className="text-red-500" onClick={() => deleteStudent(student._id)}>
+                    Delete
+                  </Button>
                 </CardFooter>
               </Card>
             ))}
@@ -186,10 +232,31 @@ export default function StudentsPage() {
             <DialogDescription></DialogDescription>
           </DialogHeader>
           <div>
-            <AddStudent setStudents={setStudents} setOpenDialog={setOpenDialog} /> 
+            <AddStudent
+              setStudents={setStudents}
+              setOpenDialog={setOpenDialog}
+            />
           </div>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={showAlertDialog} onOpenChange={setShowAlertDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. It will permanently delete the
+              student and all related data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction className='bg-red-600 hover:bg-red-700' onClick={() => confirmDelete()}>
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

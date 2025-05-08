@@ -106,7 +106,7 @@ function AddMatching() {
               <Label className="text-md">Left Item</Label>
               <Input
                 className="border-purple-500 bg-white"
-                placeholder="e.g., Yellow"
+                placeholder="e.g., Banana"
                 value={leftItem}
                 onChange={(e) => setLeftItem(e.target.value)}
               />
@@ -116,7 +116,7 @@ function AddMatching() {
               <Input
                 className="border-purple-500 bg-white"
                 value={rightItem}
-                placeholder="e.g., Banana"
+                placeholder="e.g., Yellow"
                 onChange={(e) => setRightItem(e.target.value)}
               />
             </div>

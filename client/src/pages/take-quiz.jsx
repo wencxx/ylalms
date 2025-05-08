@@ -95,6 +95,7 @@ export default function TakeQuizPage() {
     const data = {
       quizId: activity._id,
       score,
+      items
     };
 
     try {

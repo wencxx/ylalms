@@ -14,22 +14,23 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
+
 const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
+  { activity: "January", male: 186, female: 80 },
+  { activity: "February", male: 305, female: 200 },
+  { activity: "March", male: 237, female: 120 },
+  { activity: "April", male: 73, female: 190 },
+  { activity: "May", male: 209, female: 130 },
+  { activity: "June", male: 214, female: 140 },
 ]
 
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
+  male: {
+    label: "Male",
     color: "hsl(var(--chart-1))",
   },
-  mobile: {
-    label: "Mobile",
+  female: {
+    label: "Female",
     color: "hsl(var(--chart-2))",
   },
 }
@@ -45,7 +46,7 @@ export default function Chart() {
           <BarChart accessibilityLayer data={chartData}>
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="month"
+              dataKey="activity"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
@@ -55,8 +56,8 @@ export default function Chart() {
               cursor={false}
               content={<ChartTooltipContent indicator="dashed" />}
             />
-            <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-            <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
+            <Bar dataKey="male" fill="var(--color-male)" radius={4} />
+            <Bar dataKey="female" fill="var(--color-female)" radius={4} />
           </BarChart>
         </ChartContainer>
       </CardContent>

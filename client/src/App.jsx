@@ -7,6 +7,7 @@ import StudentsPage from "@/pages/students";
 import ActivitiesPage from "@/pages/activities";
 import AddQuizPage from "@/pages/add-activity";
 import TakeQuizPage from "@/pages/take-quiz";
+import StudentAnswers from "@/pages/student-answers";
 
 function App() {
   const router = createBrowserRouter([
@@ -33,6 +34,10 @@ function App() {
         {
           path: "add-activity",
           element: <AddQuizPage />,
+        },
+        {
+          path: "answers/:id",
+          element: <StudentAnswers />,
         }
       ],
     },

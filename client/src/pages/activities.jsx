@@ -105,9 +105,6 @@ function ActivitiesPage() {
                   <SelectContent>
                     <SelectItem value="dnd">Drag and Drop</SelectItem>
                     <SelectItem value="matching">Matching</SelectItem>
-                    <SelectItem value="identification">
-                      Identification
-                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -130,7 +127,7 @@ function ActivitiesPage() {
         {!fetching ? (
           activities.length ? (
             activities.map((activity, index) => (
-              <ActivityCard key={index} activity={activity} />
+              <ActivityCard key={index} activity={activity} setActivities={setActivities} />
             ))
           ) : (
             <p className="text-center col-span-full text-gray-500">
@@ -138,7 +135,9 @@ function ActivitiesPage() {
             </p>
           )
         ) : (
-          <Skeleton className="h-60 rounded-xl" />
+          Array.from({ length: 3 }).map((_, index) => (
+            <Skeleton key={index} className="h-60 rounded-xl" />
+          ))
         )}
       </div>
     </>
