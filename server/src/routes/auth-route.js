@@ -7,5 +7,6 @@ router.post('/auth/register', authenticateToken, controller.add)
 router.post('/auth/login', controller.login)
 router.get('/auth/get-user', authenticateToken, controller.getUser)
 router.get('/auth/get-all-users', authenticateToken, controller.getAllUsers)
+router.delete('/auth/delete/:id', authenticateToken, controller.deleteUser)
 
 module.exports = router

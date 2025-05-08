@@ -14,7 +14,11 @@ const answerSchema = new mongoose.Schema({
     score: {
         type: String,
         required: true
-    }
+    },
+    items: {
+        type: String,
+        required: true
+    },
 }, {
     timestamps: true
 })

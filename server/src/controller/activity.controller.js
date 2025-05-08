@@ -1,5 +1,6 @@
 const Activity = require('../models/activities')
 const Answer = require('../models/answers')
+const User = require('../models/user')
 
 exports.add = async (req, res) => {
     if (!req.body) return res.send('No data found')
@@ -25,6 +26,24 @@ exports.get = async (req, res) => {
         res.status(200).send(activities)
     } catch (error) {
         console.log(error)
+        res.status(500).send('Server error')
+    }
+}
+
+exports.delete = async (req, res) => {
+    const { id } = req.params
+    
+    try {
+        const deletedActivity = await Activity.findByIdAndDelete(id) 
+
+        if(deletedActivity){
+            await Answer.deleteMany({ quizId: deletedActivity._id });
+
+            res.status(200).send('Deleted activity successfully')
+        }else{
+            res.status(400).send('Failed to delete activity')
+        }
+    } catch (error) {
         res.status(500).send('Server error')
     }
 }
@@ -69,3 +88,38 @@ exports.addAnswer = async (req, res) => {
         res.status(500).send('Server error');
     }
 };
+
+exports.CountDashboard = async (req, res) => {
+    try {
+        const totalUser = await User.countDocuments({role: 'student'})
+        const totalMale = await User.countDocuments({ gender: 'Male', role: 'student' })
+        const totalFemale = await User.countDocuments({ gender: 'Female', role: 'student' })
+        const totalActivities = await Activity.countDocuments()
+
+        const data = {
+            totalUser,
+            totalMale,
+            totalFemale,
+            totalActivities
+        }
+
+        res.status(200).send(data)
+    } catch (error) {
+        res.status(500).send('Server error')
+    }
+}
+
+exports.getAnswers = async (req, res) => {
+    const { id } = req.params
+
+    try {
+        const answers = await Answer.find({ userId: id }).populate('quizId').lean()
+
+        if(!answers.length) return res.status(404).send('No answers found')
+
+        res.status(200).send(answers)
+    } catch (error) {
+        console.log(error)
+        res.status(500).send('Server error')
+    }
+}

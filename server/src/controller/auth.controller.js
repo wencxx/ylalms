@@ -1,4 +1,5 @@
 const User = require('../models/user')
+const Answer = require('../models/answers')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
@@ -84,6 +85,24 @@ exports.getAllUsers = async (req, res) => {
         res.status(200).send(user) 
     } catch (error) {
         console.log(error)
+        res.status(500).send('Server error')
+    }
+}
+
+exports.deleteUser = async (req, res) => {
+    const { id } = req.params
+
+    try {
+        const deletedUser = await User.findByIdAndDelete(id)
+        
+        if(deletedUser){
+            await Answer.deleteMany({ userId: deletedUser._id })
+
+            res.status(200).send("Deleted user successfully")
+        }else{
+            res.status(400).send('Failed to delete user')
+        }
+    } catch (error) {
         res.status(500).send('Server error')
     }
 }
