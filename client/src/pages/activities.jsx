@@ -105,6 +105,7 @@ function ActivitiesPage() {
                   <SelectContent>
                     <SelectItem value="dnd">Drag and Drop</SelectItem>
                     <SelectItem value="matching">Matching</SelectItem>
+                    <SelectItem value="identification">Identification</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

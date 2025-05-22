@@ -3,19 +3,49 @@ const Answer = require('../models/answers')
 const User = require('../models/user')
 
 exports.add = async (req, res) => {
-    if (!req.body) return res.send('No data found')
-
     try {
-        const newData = await Activity.create(req.body)
+        const { activityName, activityDescription, activityType, items } = req.body;
 
-        if (!newData) return res.status(400).send('Failed to add data')
+        if (!activityName || !activityDescription || !items) {
+            return res.status(400).json({ error: "Missing required fields." });
+        }
 
-        res.status(200).send('Added activity')
+        let enrichedItems;
+
+        if (req.files) {
+            enrichedItems = items.map((item, idx) => {
+                // Find a matching image file for this item, if any
+                const file = req.files?.find((f) => f.fieldname === `items[${idx}][image]`);
+
+                return {
+                    question: item.question,
+                    choices: item.choices,
+                    correctAnswer: item.correctAnswer,
+                    imageOriginalName: file?.originalname || null,
+                    imageUrl: file?.path || null, // or use `file.path` if using disk storage
+                };
+            });
+        }else{
+            enrichedItems = items
+        }
+
+        // Simulate saving to a database
+        const newActivity = {
+            activityName,
+            activityDescription,
+            activityType,
+            items: enrichedItems,
+        };
+
+        const savedActivity = await Activity.create(newActivity)
+
+        return res.status(200).json({ message: "Activity saved successfully!", data: savedActivity });
     } catch (error) {
-        console.log(error)
-        res.status(500).send('Server error')
+        console.error("Error saving activity:", error);
+        res.status(500).json({ error: "Internal server error." });
     }
-}
+};
+
 
 exports.get = async (req, res) => {
     try {
@@ -32,15 +62,15 @@ exports.get = async (req, res) => {
 
 exports.delete = async (req, res) => {
     const { id } = req.params
-    
-    try {
-        const deletedActivity = await Activity.findByIdAndDelete(id) 
 
-        if(deletedActivity){
+    try {
+        const deletedActivity = await Activity.findByIdAndDelete(id)
+
+        if (deletedActivity) {
             await Answer.deleteMany({ quizId: deletedActivity._id });
 
             res.status(200).send('Deleted activity successfully')
-        }else{
+        } else {
             res.status(400).send('Failed to delete activity')
         }
     } catch (error) {
@@ -78,7 +108,7 @@ exports.addAnswer = async (req, res) => {
 
         await Activity.findByIdAndUpdate(
             req.body.quizId,
-            { $addToSet: { submittedUser: id } }, 
+            { $addToSet: { submittedUser: id } },
             { new: true }
         );
 
@@ -91,7 +121,7 @@ exports.addAnswer = async (req, res) => {
 
 exports.CountDashboard = async (req, res) => {
     try {
-        const totalUser = await User.countDocuments({role: 'student'})
+        const totalUser = await User.countDocuments({ role: 'student' })
         const totalMale = await User.countDocuments({ gender: 'Male', role: 'student' })
         const totalFemale = await User.countDocuments({ gender: 'Female', role: 'student' })
         const totalActivities = await Activity.countDocuments()
@@ -115,7 +145,7 @@ exports.getAnswers = async (req, res) => {
     try {
         const answers = await Answer.find({ userId: id }).populate('quizId').lean()
 
-        if(!answers.length) return res.status(404).send('No answers found')
+        if (!answers.length) return res.status(404).send('No answers found')
 
         res.status(200).send(answers)
     } catch (error) {

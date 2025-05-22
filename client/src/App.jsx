@@ -10,6 +10,7 @@ import TakeQuizPage from "@/pages/take-quiz";
 import StudentAnswers from "@/pages/student-answers";
 
 function App() {
+  
   const router = createBrowserRouter([
     {
       path: "/login",

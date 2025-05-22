@@ -1,13 +1,19 @@
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
-import { motion } from "framer-motion"
-import { Sparkles, Star, Trophy, ArrowRight } from "lucide-react"
-import confetti from "canvas-confetti"
-import { Link } from "react-router-dom"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { motion } from "framer-motion";
+import { Sparkles, Star, Trophy, ArrowRight } from "lucide-react";
+import confetti from "canvas-confetti";
+import { Link } from "react-router-dom";
 
-export function QuizResultDialog({ isOpen, onClose, isPassed, score, totalQuestions = 10 }) {
-  const [isConfettiShown, setIsConfettiShown] = useState(false)
+export function QuizResultDialog({
+  isOpen,
+  onClose,
+  isPassed,
+  score,
+  totalQuestions = 10,
+}) {
+  const [isConfettiShown, setIsConfettiShown] = useState(false);
 
   // Trigger confetti when dialog opens and quiz is passed
   if (isOpen && isPassed && !isConfettiShown) {
@@ -15,8 +21,8 @@ export function QuizResultDialog({ isOpen, onClose, isPassed, score, totalQuesti
       particleCount: 100,
       spread: 70,
       origin: { y: 0.6 },
-    })
-    setIsConfettiShown(true)
+    });
+    setIsConfettiShown(true);
   }
 
   return (
@@ -24,8 +30,8 @@ export function QuizResultDialog({ isOpen, onClose, isPassed, score, totalQuesti
       open={isOpen}
       onOpenChange={(open) => {
         if (!open) {
-          onClose()
-          setIsConfettiShown(false)
+          onClose();
+          setIsConfettiShown(false);
         }
       }}
     >
@@ -43,7 +49,11 @@ export function QuizResultDialog({ isOpen, onClose, isPassed, score, totalQuesti
                   <motion.div
                     className="absolute -top-2 -right-2"
                     animate={{ rotate: 360 }}
-                    transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                    transition={{
+                      duration: 10,
+                      repeat: Number.POSITIVE_INFINITY,
+                      ease: "linear",
+                    }}
                   >
                     <Sparkles className="h-8 w-8 text-yellow-400" />
                   </motion.div>
@@ -51,27 +61,30 @@ export function QuizResultDialog({ isOpen, onClose, isPassed, score, totalQuesti
               </motion.div>
             </div>
 
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-              <h2 className="text-3xl font-bold text-green-800 mb-2">Awesome Job!</h2>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <h2 className="text-3xl font-bold text-green-800 mb-2">
+                Awesome Job!
+              </h2>
               <p className="text-lg text-green-700 mb-4">
                 You got {score} out of {totalQuestions} correct!
               </p>
-              <p className="text-md text-green-600 mb-6">You're super smart! Keep up the great work!</p>
+              <p className="text-md text-green-600 mb-6">
+                You're super smart! Keep up the great work!
+              </p>
 
               <div className="flex justify-center gap-4">
-                <Button
-                  onClick={onClose}
-                  className="bg-purple-500 hover:bg-purple-600 text-white rounded-full px-6 py-2 text-lg"
-                >
-                  Play Again
-                </Button>
-                <Button
-                  onClick={onClose}
-                  className="bg-green-500 hover:bg-green-600 text-white rounded-full px-6 py-2 text-lg flex items-center gap-2"
-                >
-                  Next Lesson
-                  <ArrowRight className="h-5 w-5" />
-                </Button>
+                <Link to="/activities">
+                  <Button
+                    onClick={onClose}
+                    className="bg-orange-500 hover:bg-orange-600 text-white rounded-full px-6 py-2 text-lg"
+                  >
+                    Other Activities
+                  </Button>
+                </Link>
               </div>
             </motion.div>
           </div>
@@ -102,17 +115,24 @@ export function QuizResultDialog({ isOpen, onClose, isPassed, score, totalQuesti
               </motion.div>
             </div>
 
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-              <h2 className="text-3xl font-bold text-blue-800 mb-2">Nice Try!</h2>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <h2 className="text-3xl font-bold text-blue-800 mb-2">
+                Nice Try!
+              </h2>
               <p className="text-lg text-blue-700 mb-4">
                 You got {score} out of {totalQuestions}
               </p>
               <p className="text-md text-blue-600 mb-6">
-                You're doing great! Let's try again and see if we can do even better!
+                You're doing great! Let's try again and see if we can do even
+                better!
               </p>
 
               <div className="flex justify-center gap-4">
-                <Link to='/activities'>
+                <Link to="/activities">
                   <Button
                     onClick={onClose}
                     className="bg-orange-500 hover:bg-orange-600 text-white rounded-full px-6 py-2 text-lg"
@@ -126,5 +146,5 @@ export function QuizResultDialog({ isOpen, onClose, isPassed, score, totalQuesti
         )}
       </DialogContent>
     </Dialog>
-  )
+  );
 }

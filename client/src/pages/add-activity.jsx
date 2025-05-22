@@ -5,35 +5,37 @@ import { useNavigate } from "react-router-dom";
 // components
 import AddMatching from "@/components/activities/add-matching";
 import AddDragAndDrop from "@/components/activities/add-drag-and-drop";
+import AddIdentification from "@/components/activities/add-identification";
 
 function AddQuizPage() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const activity = searchParams.get("q");
 
   // navigate back to activites if no query found
   useEffect(() => {
     if (!activity) {
-      return navigate('/activities')
+      return navigate("/activities");
     }
-  }, [activity])
+  }, [activity]);
 
   return (
     <>
       <Card className="w-full max-w-4xl mt-5 bg-sky-100 mx-auto">
         <CardHeader>
           <h1 className="text-xl text-blue-500 font-semibold capitalize">
-            Add {activity === 'dnd' ? 'Drag and Drop' : activity} Activity
+            Add {activity === "dnd" ? "Drag and Drop" : activity} Activity
           </h1>
         </CardHeader>
         {activity === "matching" ? (
           <AddMatching />
         ) : activity === "dnd" ? (
           <AddDragAndDrop />
+        ) : activity === "identification" ? (
+          <AddIdentification />
         ) : (
           <h1>Activity not found</h1>
         )}
-
       </Card>
     </>
   );

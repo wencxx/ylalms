@@ -7,13 +7,14 @@ import {
 } from "@/components/ui/card";
 import DndQuiz from "@/components/quiz/dnd-quiz";
 import MatchingQuiz from "@/components/quiz/matching-quiz";
+import IdentificationQuiz from "@/components/quiz/identification-quiz";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/auth/auth-provider";
-import { QuizResultDialog } from '@/components/quiz-result-dialog'
+import { QuizResultDialog } from "@/components/quiz-result-dialog";
 
 const colors = [
   "bg-orange-400",
@@ -37,7 +38,7 @@ export default function TakeQuizPage() {
   const { id } = useParams();
   const { currentUser } = useAuth();
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const [score, setScore] = useState(0);
   const [items, setItems] = useState(0);
@@ -78,24 +79,24 @@ export default function TakeQuizPage() {
   }, []);
 
   useEffect(() => {
-    if(activity){
-      if(activity.submittedUser.includes(currentUser._id)){
-        toast.warning("You already taken this quiz.")
-        navigate('/activities')
+    if (activity) {
+      if (activity.submittedUser.includes(currentUser._id)) {
+        toast.warning("You already taken this quiz.");
+        navigate("/activities");
       }
     }
-  }, [activity])
+  }, [activity]);
 
   // submit quiz
-  const [showPassDialog, setShowPassDialog] = useState(false)
-  const [showFailDialog, setShowFailDialog] = useState(false)
+  const [showPassDialog, setShowPassDialog] = useState(false);
+  const [showFailDialog, setShowFailDialog] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const submitQuiz = async () => {
     const data = {
       quizId: activity._id,
       score,
-      items
+      items,
     };
 
     try {
@@ -112,10 +113,10 @@ export default function TakeQuizPage() {
       );
 
       if (res.status === 200) {
-        if(score >= (0.75 * items)){
-          setShowPassDialog(true)
-        }else{
-          setShowFailDialog(true)
+        if (score >= 0.75 * items) {
+          setShowPassDialog(true);
+        } else {
+          setShowFailDialog(true);
         }
       } else {
         toast.error("Failed submitting quiz", {
@@ -141,14 +142,29 @@ export default function TakeQuizPage() {
           <Card className="w-full max-w-6xl mx-auto bg-rose-300">
             <CardHeader>
               <h1 className="text-2xl font-bold capitalize text-blue-500">
-                {activity.activityName}
+                {activity.activityName} {score} {items}
               </h1>
               <p className="text-gray-700">{activity.activityDescription}</p>
             </CardHeader>
             {activity.activityType === "dnd" ? (
-              <DndQuiz data={activity} setScore={setScore} colors={colors} setItems={setItems} />
+              <DndQuiz
+                data={activity}
+                setScore={setScore}
+                colors={colors}
+                setItems={setItems}
+              />
+            ) : activity.activityType === "identification" ? (
+              <IdentificationQuiz
+                data={activity}
+                setScore={setScore}
+                setItems={setItems}
+              />
             ) : (
-              <MatchingQuiz data={activity.items} setScore={setScore} setItems={setItems} />
+              <MatchingQuiz
+                data={activity.items}
+                setScore={setScore}
+                setItems={setItems}
+              />
             )}
             <CardFooter className="flex justify-end">
               <Button
