@@ -9,6 +9,13 @@ const activitySchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    dueDate: {
+        type: Date,
+    },
+    type: {
+        type: String,
+        default: 'activity'
+    },
     activityType: {
         type: String,
         required: true

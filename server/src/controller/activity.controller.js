@@ -4,7 +4,7 @@ const User = require('../models/user')
 
 exports.add = async (req, res) => {
     try {
-        const { activityName, activityDescription, activityType, items } = req.body;
+        const { activityName, activityDescription, activityType, type, dueDate, items } = req.body;
 
         if (!activityName || !activityDescription || !items) {
             return res.status(400).json({ error: "Missing required fields." });
@@ -33,6 +33,9 @@ exports.add = async (req, res) => {
         const newActivity = {
             activityName,
             activityDescription,
+            activityDescription,
+            type: type || 'activity ',
+            dueDate,
             activityType,
             items: enrichedItems,
         };
@@ -49,7 +52,20 @@ exports.add = async (req, res) => {
 
 exports.get = async (req, res) => {
     try {
-        const activities = await Activity.find()
+        const activities = await Activity.find({ type: 'activity' })
+
+        if (!activities.length) return res.status(404).send('No activities found')
+
+        res.status(200).send(activities)
+    } catch (error) {
+        console.log(error)
+        res.status(500).send('Server error')
+    }
+}
+
+exports.getTodo = async (req, res) => {
+    try {
+        const activities = await Activity.find({ type: 'todo' })
 
         if (!activities.length) return res.status(404).send('No activities found')
 

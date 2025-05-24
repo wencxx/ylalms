@@ -8,6 +8,7 @@ const upload = multer({ storage })
 
 router.post('/activity/add', upload.any(), authenticateToken, controller.add)
 router.get('/activity/get', authenticateToken, controller.get)
+router.get('/activity/get-todo', authenticateToken, controller.getTodo)
 router.get('/activity/get/:id', authenticateToken, controller.getSpecific)
 router.post('/activity/add-answer', authenticateToken, controller.addAnswer)
 router.get('/activity/count-dashboard', authenticateToken, controller.CountDashboard)
