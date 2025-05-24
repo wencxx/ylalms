@@ -21,7 +21,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import moment from "moment";
 
 const colors = {
   matching: "bg-blue-300",
@@ -53,9 +52,7 @@ function ActivityCard({ activity, setActivities }) {
     try {
       setDeleting(false);
       const res = await axios.delete(
-        `${
-          import.meta.env.VITE_ENDPOINT
-        }api/activity/delete/${activityToDelete}`,
+        `${import.meta.env.VITE_ENDPOINT}api/activity/delete/${activityToDelete}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -87,34 +84,19 @@ function ActivityCard({ activity, setActivities }) {
         } dark:bg-neutral-600`}
       >
         <CardHeader>
-          <div className="flex justify-end gap-x-2">
-            {currentUser.role === "student" && activity.dueDate &&
-              moment(activity.dueDate).format("lll") <
-                moment(new Date()).format("lll") && (
-                <Badge className={`capitalize bg-red-500 dark:bg-neutral-300`}>
-                  Missed
-                </Badge>
-              )}
-            <Badge className={`capitalize bg-fuchsia-400 dark:bg-neutral-300`}>
-              {activity.activityType === "dnd"
-                ? "Drag and Drop"
-                : activity.activityType}
-            </Badge>
-          </div>
+          <Badge
+            className={`ml-auto capitalize bg-fuchsia-400 dark:bg-neutral-300`}
+          >
+            {activity.activityType === "dnd"
+              ? "Drag and Drop"
+              : activity.activityType}
+          </Badge>
         </CardHeader>
         <CardContent className="space-y-3">
           <h2 className="text-lg font-medium tracking-wide">
             {activity.activityName}
           </h2>
-          <div>
-            <p className="text-gray-100">{activity.activityDescription}</p>
-            {activity.dueDate && (
-              <p className="text-gray-100">
-                <span className="font-semibold">Due Date:</span>{" "}
-                {moment(activity.dueDate).format("lll")}
-              </p>
-            )}
-          </div>
+          <p className="text-gray-100">{activity.activityDescription}</p>
         </CardContent>
         <CardFooter>
           {currentUser.role === "teacher" ? (
@@ -125,16 +107,6 @@ function ActivityCard({ activity, setActivities }) {
               disabled={deleting}
             >
               {deleting ? "Deleting" : "Delete"}
-            </Button>
-          ) : activity.dueDate &&
-            moment(activity.dueDate).format("lll") <
-              moment(new Date()).format("lll") ? (
-            <Button
-              className="w-full cursor-pointer"
-              disabled
-              variant='destructive'
-            >
-              Missed
             </Button>
           ) : (
             <Button
@@ -166,10 +138,7 @@ function ActivityCard({ activity, setActivities }) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-red-600 hover:bg-red-700"
-              onClick={() => confirmDelete()}
-            >
+            <AlertDialogAction className='bg-red-600 hover:bg-red-700' onClick={() => confirmDelete()}>
               Continue
             </AlertDialogAction>
           </AlertDialogFooter>

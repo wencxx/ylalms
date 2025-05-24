@@ -34,11 +34,21 @@ const data = {
       url: "/activities",
       emoji: "✍️",
     },
+    {
+      name: "Todo",
+      url: "/todo",
+      emoji: "✍️",
+    },
   ],
   students: [
     {
       name: "Activities",
       url: "/activities",
+      emoji: "✍️",
+    },
+    {
+      name: "Todo",
+      url: "/todo",
       emoji: "✍️",
     },
   ],

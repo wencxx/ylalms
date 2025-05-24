@@ -5,7 +5,9 @@ import LoginPage from "@/pages/login";
 import HomePage from "@/pages/home";
 import StudentsPage from "@/pages/students";
 import ActivitiesPage from "@/pages/activities";
+import TodoPage from "@/pages/todo";
 import AddQuizPage from "@/pages/add-activity";
+import AddTodoPage from "@/pages/add-todo";
 import TakeQuizPage from "@/pages/take-quiz";
 import StudentAnswers from "@/pages/student-answers";
 
@@ -37,6 +39,10 @@ function App() {
           element: <AddQuizPage />,
         },
         {
+          path: "add-todo",
+          element: <AddTodoPage />,
+        },
+        {
           path: "answers/:id",
           element: <StudentAnswers />,
         }
@@ -53,6 +59,10 @@ function App() {
         {
           path: "activities",
           element: <ActivitiesPage />,
+        },
+        {
+          path: "todo",
+          element: <TodoPage />,
         },
         {
           path: "quiz/:id",

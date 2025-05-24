@@ -24,7 +24,7 @@ import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/components/auth/auth-provider";
 
-function ActivitiesPage() {
+function TodoPage() {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
 
@@ -36,7 +36,7 @@ function ActivitiesPage() {
     try {
       setFetching(true);
       const res = await axios.get(
-        `${import.meta.env.VITE_ENDPOINT}api/activity/get`,
+        `${import.meta.env.VITE_ENDPOINT}api/activity/get-todo`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -73,25 +73,25 @@ function ActivitiesPage() {
     setLoading(true);
 
     setTimeout(() => {
-      navigate(`/add-activity?q=${selectedQuizType}`);
+      navigate(`/add-todo?q=${selectedQuizType}`);
       setLoading(false);
     }, 1500);
   };
   return (
     <>
       <div className="w-full flex justify-between">
-        <h1 className="text-lg">Activity Lists</h1>
+        <h1 className="text-lg">Todo Lists</h1>
         {currentUser.role === "teacher" && (
           <Dialog>
             <DialogTrigger asChild>
               <Button>
                 <Plus />
-                Add Activity
+                Add Todo
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Select activity type</DialogTitle>
+                <DialogTitle>Select todo type</DialogTitle>
                 <DialogDescription>
                   Pick the kind of todo you want to add. It could be a fun
                   matching, drag and drop, or a identification!
@@ -105,9 +105,7 @@ function ActivitiesPage() {
                   <SelectContent>
                     <SelectItem value="dnd">Drag and Drop</SelectItem>
                     <SelectItem value="matching">Matching</SelectItem>
-                    <SelectItem value="identification">
-                      Identification
-                    </SelectItem>
+                    <SelectItem value="identification">Identification</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -130,11 +128,7 @@ function ActivitiesPage() {
         {!fetching ? (
           activities.length ? (
             activities.map((activity, index) => (
-              <ActivityCard
-                key={index}
-                activity={activity}
-                setActivities={setActivities}
-              />
+              <ActivityCard key={index} activity={activity} setActivities={setActivities} />
             ))
           ) : (
             <p className="text-center col-span-full text-gray-500">
@@ -151,4 +145,4 @@ function ActivitiesPage() {
   );
 }
 
-export default ActivitiesPage;
+export default TodoPage;
