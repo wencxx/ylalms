@@ -25,7 +25,7 @@ exports.add = async (req, res) => {
                     imageUrl: file?.path || null, // or use `file.path` if using disk storage
                 };
             });
-        }else{
+        } else {
             enrichedItems = items
         }
 
@@ -34,7 +34,7 @@ exports.add = async (req, res) => {
             activityName,
             activityDescription,
             activityDescription,
-            type: type || 'activity ',
+            type: type || 'activity',
             dueDate,
             activityType,
             items: enrichedItems,
@@ -140,7 +140,7 @@ exports.CountDashboard = async (req, res) => {
         const totalUser = await User.countDocuments({ role: 'student' })
         const totalMale = await User.countDocuments({ gender: 'Male', role: 'student' })
         const totalFemale = await User.countDocuments({ gender: 'Female', role: 'student' })
-        const totalActivities = await Activity.countDocuments()
+        const totalActivities = await Activity.countDocuments({ type: 'activity' })
 
         const data = {
             totalUser,
