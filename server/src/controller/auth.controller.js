@@ -6,11 +6,11 @@ const jwt = require('jsonwebtoken')
 exports.add = async (req, res) => {
     const { username, password, ...rest } = req.body
     try {
-        if(!username || !password) return res.status(404).send('Credentials not found')
+        if (!username || !password) return res.status(404).send('Credentials not found')
 
         const isExisting = await User.findOne({ username })
 
-        if(isExisting) return res.status(400).send('Username already exist')
+        if (isExisting) return res.status(400).send('Username already exist')
 
         const hashedPass = await bcrypt.hash(password, Number(process.env.SALT_ROUNDS))
 
@@ -22,9 +22,9 @@ exports.add = async (req, res) => {
 
         const newUser = await User.create(userData)
 
-        if(newUser){
+        if (newUser) {
             res.status(200).send(newUser)
-        }else{
+        } else {
             res.status(400).send('Failed to add student')
         }
     } catch (error) {
@@ -40,11 +40,11 @@ exports.login = async (req, res) => {
     try {
         const existingUser = await User.findOne({ username }).lean()
 
-        if(!existingUser) return res.status(404).send('Student not found')
+        if (!existingUser) return res.status(404).send('Student not found')
 
         const isMatch = await bcrypt.compare(password, existingUser.password)
 
-        if(!isMatch) return res.status(401).send('Invalid password')
+        if (!isMatch) return res.status(401).send('Invalid password')
 
         const token = jwt.sign({ id: existingUser._id, usename: existingUser.username }, process.env.SECRET_KEY)
 
@@ -65,9 +65,9 @@ exports.getUser = async (req, res) => {
     try {
         const userData = await User.findById(id)
 
-        if(!userData) return res.status(404).send('User not found')
+        if (!userData) return res.status(404).send('User not found')
 
-        res.status(200).send(userData) 
+        res.status(200).send(userData)
     } catch (error) {
         console.log(error)
         res.status(500).send('Server error')
@@ -80,9 +80,42 @@ exports.getAllUsers = async (req, res) => {
             role: 'student'
         })
 
-        if(!user.length) return res.status(404).send('Users not found')
+        if (!user.length) return res.status(404).send('Users not found')
 
-        res.status(200).send(user) 
+        res.status(200).send(user)
+    } catch (error) {
+        console.log(error)
+        res.status(500).send('Server error')
+    }
+}
+
+exports.getSpecificUser = async (req, res) => {
+    const { id } = req.params
+    try {
+        const user = await User.findById(id)
+
+
+        if (!user) return res.status(404).send('User not found')
+
+        const answers = await Answer.find({ userId: id }).sort({ createdAt: -1 }).populate('quizId').lean()
+
+        let totalPercentage = 0;
+        let validAnswerCount = 0;
+
+        answers.forEach(answer => {
+            if (answer.items > 0) {
+                const percentage = (answer.score / answer.items) * 100;
+                totalPercentage += percentage;
+                validAnswerCount++;
+            }
+        });
+
+        const averageScore = validAnswerCount > 0
+            ? (totalPercentage / validAnswerCount).toFixed(2)
+            : 0;
+
+
+        res.status(200).send({ user, answers, averageScore })
     } catch (error) {
         console.log(error)
         res.status(500).send('Server error')
@@ -94,12 +127,12 @@ exports.deleteUser = async (req, res) => {
 
     try {
         const deletedUser = await User.findByIdAndDelete(id)
-        
-        if(deletedUser){
+
+        if (deletedUser) {
             await Answer.deleteMany({ userId: deletedUser._id })
 
             res.status(200).send("Deleted user successfully")
-        }else{
+        } else {
             res.status(400).send('Failed to delete user')
         }
     } catch (error) {
