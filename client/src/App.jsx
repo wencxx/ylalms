@@ -10,6 +10,7 @@ import AddQuizPage from "@/pages/add-activity";
 import AddTodoPage from "@/pages/add-todo";
 import TakeQuizPage from "@/pages/take-quiz";
 import StudentAnswers from "@/pages/student-answers";
+import ProfilePage from "@/pages/profile";
 
 function App() {
   
@@ -45,6 +46,10 @@ function App() {
         {
           path: "answers/:id",
           element: <StudentAnswers />,
+        },
+        {
+          path: "profile/:id",
+          element: <ProfilePage />,
         }
       ],
     },
@@ -68,6 +73,10 @@ function App() {
           path: "quiz/:id",
           element: <TakeQuizPage />,
         },
+        {
+          path: "profile",
+          element: <ProfilePage />,
+        }
       ],
     },
   ]);

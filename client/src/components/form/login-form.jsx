@@ -31,7 +31,7 @@ export function LoginForm({ className, ...props }) {
       if(role === 'teacher'){
         navigate('/')
       }else{
-        navigate('/activities')
+        navigate('/profile')
       }
 
     } catch (error) {

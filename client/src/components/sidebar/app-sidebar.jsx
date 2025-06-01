@@ -42,6 +42,11 @@ const data = {
   ],
   students: [
     {
+      name: "Profile",
+      url: "/Profile",
+      emoji: "👦",
+    },
+    {
       name: "Activities",
       url: "/activities",
       emoji: "✍️",

@@ -170,7 +170,7 @@ export default function StudentsPage() {
                       />
                     </div>
                     <div>
-                      <h3 className="font-bold text-lg text-purple-900">
+                      <Link to={`/profile/${student._id}`} className="font-bold text-lg text-purple-900">
                         {[
                           student.firstName,
                           student.middleName,
@@ -178,7 +178,7 @@ export default function StudentsPage() {
                         ]
                           .filter(Boolean)
                           .join(" ")}
-                      </h3>
+                      </Link>
                       <p className="text-purple-600">{student.gender}</p>
                     </div>
                   </div>
