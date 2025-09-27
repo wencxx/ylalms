@@ -19,6 +19,14 @@ const answerSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    correctAnswers: {
+        type: [mongoose.Schema.Types.Mixed],
+        default: []
+    },
+    wrongAnswers: {
+        type: [mongoose.Schema.Types.Mixed],
+        default: []
+    },
 }, {
     timestamps: true
 })

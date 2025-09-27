@@ -42,6 +42,9 @@ export default function TakeQuizPage() {
 
   const [score, setScore] = useState(0);
   const [items, setItems] = useState(0);
+  const [correctAnswers, setCorrectAnswers] = useState([]);
+  const [wrongAnswers, setWrongAnswers] = useState([]);
+  const [droppedItems, setDroppedItems] = useState({}); // <-- add this
 
   // get activity
   const [activity, setActivity] = useState(null);
@@ -80,8 +83,14 @@ export default function TakeQuizPage() {
 
   useEffect(() => {
     if (activity) {
-      if (activity.submittedUser.includes(currentUser._id)) {
-        toast.warning("You already taken this quiz.");
+      // Find the user's submission object
+      const userSubmission = activity.submittedUser.find(
+        (u) => u.id === currentUser._id
+      );
+      if (userSubmission && userSubmission.attempt >= 3) {
+        toast.warning(
+          "You have reached the maximum number of attempts for this quiz."
+        );
         navigate("/activities");
       }
     }
@@ -97,6 +106,9 @@ export default function TakeQuizPage() {
       quizId: activity._id,
       score,
       items,
+      correctAnswers,
+      wrongAnswers,
+      droppedItems, // <-- include droppedItems in submission
     };
 
     try {
@@ -118,6 +130,11 @@ export default function TakeQuizPage() {
         } else {
           setShowFailDialog(true);
         }
+      } else if (res.status === 403) {
+        toast.error("Maximum attempts reached", {
+          description: "You cannot take this quiz anymore.",
+        });
+        navigate("/activities");
       } else {
         toast.error("Failed submitting quiz", {
           description: "Please try again later.",
@@ -139,43 +156,72 @@ export default function TakeQuizPage() {
     <>
       {!fetching ? (
         activity && (
-          <Card className="w-full max-w-6xl mx-auto bg-rose-300">
-            <CardHeader>
-              <h1 className="text-2xl font-bold capitalize text-blue-500">
-                {activity.activityName} {score} {items}
-              </h1>
-              <p className="text-gray-700">{activity.activityDescription}</p>
-            </CardHeader>
-            {activity.activityType === "dnd" ? (
-              <DndQuiz
-                data={activity}
-                setScore={setScore}
-                colors={colors}
-                setItems={setItems}
-              />
-            ) : activity.activityType === "identification" ? (
-              <IdentificationQuiz
-                data={activity}
-                setScore={setScore}
-                setItems={setItems}
-              />
-            ) : (
-              <MatchingQuiz
-                data={activity.items}
-                setScore={setScore}
-                setItems={setItems}
-              />
-            )}
-            <CardFooter className="flex justify-end">
-              <Button
-                onClick={() => submitQuiz()}
-                disabled={submitting}
-                className={`${submitting && "animate-pulse"}`}
-              >
-                {submitting ? "Submitting Quiz" : "Submit Quiz"}
-              </Button>
-            </CardFooter>
-          </Card>
+          <>
+            <Card className="w-full max-w-6xl mx-auto bg-rose-300">
+              <CardHeader>
+                <h1 className="text-2xl font-bold capitalize text-blue-500">
+                  {activity.activityName}
+                </h1>
+                <p className="text-gray-700">{activity.activityDescription}</p>
+              </CardHeader>
+              {activity.activityType === "dnd" ? (
+                <DndQuiz
+                  data={activity}
+                  setScore={setScore}
+                  colors={colors}
+                  setItems={setItems}
+                  setCorrectAnswers={setCorrectAnswers}
+                  setWrongAnswers={setWrongAnswers}
+                  setDroppedItems={setDroppedItems} // <-- pass setter
+                  droppedItems={droppedItems} // <-- pass value
+                />
+              ) : activity.activityType === "identification" ? (
+                <IdentificationQuiz
+                  data={activity}
+                  setScore={setScore}
+                  setItems={setItems}
+                  setCorrectAnswers={setCorrectAnswers}
+                  setWrongAnswers={setWrongAnswers}
+                />
+              ) : (
+                <MatchingQuiz
+                  data={activity.items}
+                  setScore={setScore}
+                  setItems={setItems}
+                  setCorrectAnswers={setCorrectAnswers}
+                  setWrongAnswers={setWrongAnswers}
+                />
+              )}
+              <CardFooter className="flex justify-end">
+                <Button
+                  onClick={() => submitQuiz()}
+                  disabled={submitting}
+                  className={`${submitting && "animate-pulse"}`}
+                >
+                  {submitting ? "Submitting Quiz" : "Submit Quiz"}
+                </Button>
+              </CardFooter>
+            </Card>
+
+            {/* dialog for success quiz */}
+            <QuizResultDialog
+              isOpen={showPassDialog}
+              onClose={() => setShowPassDialog(false)}
+              isPassed={true}
+              score={score}
+              activityType={activity.type}
+              totalQuestions={items}
+            />
+
+            <QuizResultDialog
+              isOpen={showFailDialog}
+              onClose={() => setShowFailDialog(false)}
+              isPassed={false}
+              score={score}
+              activityType={activity.type}
+              totalQuestions={items}
+            />
+          </>
         )
       ) : (
         <Card className="w-full max-w-6xl mx-auto bg-rose-300">
@@ -192,23 +238,6 @@ export default function TakeQuizPage() {
           </CardContent>
         </Card>
       )}
-
-      {/* dialog for success quiz */}
-      <QuizResultDialog
-        isOpen={showPassDialog}
-        onClose={() => setShowPassDialog(false)}
-        isPassed={true}
-        score={score}
-        totalQuestions={items}
-      />
-
-      <QuizResultDialog
-        isOpen={showFailDialog}
-        onClose={() => setShowFailDialog(false)}
-        isPassed={false}
-        score={score}
-        totalQuestions={items}
-      />
     </>
   );
 }

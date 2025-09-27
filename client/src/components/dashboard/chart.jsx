@@ -1,71 +1,61 @@
-import { TrendingUp } from "lucide-react"
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
+import { TrendingUp } from "lucide-react";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
-
-const chartData = [
-  { activity: "January", male: 186, female: 80 },
-  { activity: "February", male: 305, female: 200 },
-  { activity: "March", male: 237, female: 120 },
-  { activity: "April", male: 73, female: 190 },
-  { activity: "May", male: 209, female: 130 },
-  { activity: "June", male: 214, female: 140 },
-]
+} from "@/components/ui/chart";
 
 const chartConfig = {
-  male: {
-    label: "Male",
+  averagePercentage: {
+    label: "Average %",
     color: "hsl(var(--chart-1))",
   },
-  female: {
-    label: "Female",
-    color: "hsl(var(--chart-2))",
-  },
-}
+};
 
-export default function Chart() {
+export default function Chart({ chartData, type }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Chart title nadi</CardTitle>
+        <CardTitle className="capitalize">{type} Performance</CardTitle>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
+        <ChartContainer config={chartConfig} className="h-96">
           <BarChart accessibilityLayer data={chartData}>
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="activity"
+              dataKey="quiz"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
+              tickFormatter={(value) => value.slice(0, 6)}
             />
+            <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent indicator="dashed" />}
             />
-            <Bar dataKey="male" fill="var(--color-male)" radius={4} />
-            <Bar dataKey="female" fill="var(--color-female)" radius={4} />
+            <Bar
+              dataKey="averagePercentage"
+              fill="var(--color-averagePercentage)"
+              radius={6}
+            />
           </BarChart>
         </ChartContainer>
       </CardContent>
       <CardFooter className="text-sm">
         <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
+          Showing average {type} scores (in %)
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }

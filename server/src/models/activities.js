@@ -22,8 +22,14 @@ const activitySchema = new mongoose.Schema({
     },
     submittedUser: [
         {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
+            id: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User',
+            },
+            attempt: {
+                type: Number,
+                default: 0
+            }
         }
     ]
 }, {

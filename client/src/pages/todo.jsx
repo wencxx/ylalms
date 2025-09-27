@@ -132,7 +132,7 @@ function TodoPage() {
             ))
           ) : (
             <p className="text-center col-span-full text-gray-500">
-              No activities to show
+              No todo to show
             </p>
           )
         ) : (

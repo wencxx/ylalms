@@ -1,5 +1,6 @@
 const User = require('../models/user')
 const Answer = require('../models/answers')
+const Activity = require('../models/activities')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
@@ -76,13 +77,30 @@ exports.getUser = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
     try {
-        const user = await User.find({
+        const users = await User.find({
             role: 'student'
-        })
+        }).lean()
 
-        if (!user.length) return res.status(404).send('Users not found')
+        if (!users.length) return res.status(404).send('Users not found')
 
-        res.status(200).send(user)
+        const totalActivities = await Activity.countDocuments()
+
+        const usersWithPercentage = []
+
+        for (const user of users) {
+            const userAnswer = await Answer.find({ userId: user._id })
+
+            const quizIds = userAnswer.map(a => a.quizId.toString())
+
+            const uniqueIds = new Set(quizIds)
+
+            const percentage = (uniqueIds.size / totalActivities) * 100
+
+            usersWithPercentage.push({ ...user, percentage })
+        }
+
+
+        res.status(200).send(usersWithPercentage)
     } catch (error) {
         console.log(error)
         res.status(500).send('Server error')
@@ -94,17 +112,21 @@ exports.getSpecificUser = async (req, res) => {
     try {
         const user = await User.findById(id)
 
-
         if (!user) return res.status(404).send('User not found')
 
-        const answers = await Answer.find({ userId: id }).sort({ createdAt: -1 }).populate('quizId').lean()
+        const answers = await Answer.find({ userId: id })
+            .sort({ createdAt: -1 })
+            .populate('quizId')
+            .lean()
 
         let totalPercentage = 0;
         let validAnswerCount = 0;
 
         answers.forEach(answer => {
-            if (answer.items > 0) {
-                const percentage = (answer.score / answer.items) * 100;
+            const score = Number(answer.score);
+            const items = Number(answer.items);
+            if (items > 0) {
+                const percentage = (score / items) * 100;
                 totalPercentage += percentage;
                 validAnswerCount++;
             }
@@ -114,8 +136,10 @@ exports.getSpecificUser = async (req, res) => {
             ? (totalPercentage / validAnswerCount).toFixed(2)
             : 0;
 
+        const activities = answers.filter((a) => String(a.quizId?.type) == 'activity')
+        const todos = answers.filter((a) => String(a.quizId?.type) == 'todo')
 
-        res.status(200).send({ user, answers, averageScore })
+        res.status(200).send({ user, activities, todos, averageScore })
     } catch (error) {
         console.log(error)
         res.status(500).send('Server error')
@@ -136,6 +160,58 @@ exports.deleteUser = async (req, res) => {
             res.status(400).send('Failed to delete user')
         }
     } catch (error) {
+        res.status(500).send('Server error')
+    }
+}
+
+exports.usersGrades = async (req, res) => {
+    try {
+        const users = await User.find({
+            role: 'student'
+        }).lean()
+
+        if (!users.length) return res.status(404).send('Users not found')
+
+        const usersWithGrades = []
+
+        for (const user of users) {
+            const answers = await Answer.find({ userId: user._id }).populate('quizId')
+
+            if (!answers.length) continue
+
+            let totalAnswersTodo = 0
+            let totalItemsTodo = 0
+            let totalAnswersActivities = 0
+            let totalItemsActivities = 0
+
+            for (const answer of answers) {
+                if (answer.quizId?.type === 'todo') {
+                    totalAnswersTodo += answer.score
+                    totalItemsTodo += answer.items
+                } else {
+                    totalAnswersActivities += answer.score
+                    totalItemsActivities += answer.items
+                }
+            }
+
+            const totalGradeTodo = totalItemsTodo ? (totalAnswersTodo / totalItemsTodo) * 100 : 0
+            const totalGradeActivities = totalItemsActivities ? (totalAnswersActivities / totalItemsActivities) * 100 : 0
+
+            const userDataWithGrades = {
+                ...user,
+                totalGradeTodo,
+                totalGradeActivities
+            }
+
+            usersWithGrades.push(userDataWithGrades)
+        }
+
+        if (!usersWithGrades.length) return res.status(404).send('No grades found')
+
+
+        res.status(200).send(usersWithGrades)
+    } catch (error) {
+        console.log(error)
         res.status(500).send('Server error')
     }
 }

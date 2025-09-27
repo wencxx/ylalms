@@ -11,6 +11,8 @@ import AddTodoPage from "@/pages/add-todo";
 import TakeQuizPage from "@/pages/take-quiz";
 import StudentAnswers from "@/pages/student-answers";
 import ProfilePage from "@/pages/profile";
+import QuizResultPage from "@/pages/quiz-result";
+import GradesPage from "./pages/grades";
 
 function App() {
   
@@ -34,6 +36,10 @@ function App() {
         {
           path: "students",
           element: <StudentsPage />,
+        },
+        {
+          path: "grades",
+          element: <GradesPage />,
         },
         {
           path: "add-activity",
@@ -72,6 +78,10 @@ function App() {
         {
           path: "quiz/:id",
           element: <TakeQuizPage />,
+        },
+        {
+          path: "result/:resultId",
+          element: <QuizResultPage />,
         },
         {
           path: "profile",

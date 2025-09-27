@@ -24,10 +24,10 @@ import {
 import moment from "moment";
 
 const colors = {
-  matching: "bg-blue-300",
-  dnd: "bg-red-400",
-  identification: "bg-orange-300",
-  essay: "bg-cyan-400",
+  matching: "bg-[#87C7F1]",
+  dnd: "bg-[#EACFFF]",
+  identification: "bg-[#FFEDA9]",
+  essay: "bg-[#AAE9E5]",
 };
 
 function ActivityCard({ activity, setActivities }) {
@@ -88,9 +88,9 @@ function ActivityCard({ activity, setActivities }) {
       >
         <CardHeader>
           <div className="flex justify-end gap-x-2">
-            {currentUser.role === "student" && activity.dueDate &&
-              moment(activity.dueDate).format("lll") <
-                moment(new Date()).format("lll") && (
+            {currentUser.role === "student" &&
+              activity.dueDate &&
+              moment(activity.dueDate).isBefore(moment()) && (
                 <Badge className={`capitalize bg-red-500 dark:bg-neutral-300`}>
                   Missed
                 </Badge>
@@ -103,53 +103,66 @@ function ActivityCard({ activity, setActivities }) {
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
-          <h2 className="text-lg font-medium tracking-wide">
+          <h2 className="text-black capitalize text-lg font-medium tracking-wide">
             {activity.activityName}
           </h2>
           <div>
-            <p className="text-gray-100">{activity.activityDescription}</p>
+            <p className="text-black capitalize">{activity.activityDescription}</p>
             {activity.dueDate && (
-              <p className="text-gray-100">
+              <p className="text-black">
                 <span className="font-semibold">Due Date:</span>{" "}
                 {moment(activity.dueDate).format("lll")}
               </p>
             )}
+            {/* Show attempts for student */}
+            {currentUser.role === "student" &&
+              (() => {
+                const userSubmission = activity.submittedUser.find(
+                  (u) => u.id === currentUser._id
+                );
+                if (userSubmission) {
+                  return (
+                    <p className="text-black">
+                      <span className="font-semibold">Attempts:</span>{" "}
+                      {userSubmission.attempt} / 3
+                    </p>
+                  );
+                }
+                return null;
+              })()}
           </div>
         </CardContent>
         <CardFooter>
           {currentUser.role === "teacher" ? (
             <Button
-              variant="destructive"
-              className={`w-full cursor-pointer ${deleting && "animate-pulse"}`}
+              className={`w-full cursor-pointer bg-red-400 hover:bg-red-500 ${deleting && "animate-pulse"}`}
               onClick={() => deleteActivity(activity._id)}
               disabled={deleting}
             >
               {deleting ? "Deleting" : "Delete"}
             </Button>
           ) : activity.dueDate &&
-            moment(activity.dueDate).format("lll") <
-              moment(new Date()).format("lll") ? (
+            moment(activity.dueDate).isBefore(moment()) ? (
             <Button
-              className="w-full cursor-pointer"
+              className="w-full cursor-pointer bg-red-400"
               disabled
-              variant='destructive'
             >
               Missed
             </Button>
           ) : (
             <Button
-              className="w-full cursor-pointer"
-              disabled={activity.submittedUser.includes(currentUser._id)}
-              onClick={() => takeQuiz(activity._id)}
-              variant={
-                activity.submittedUser.includes(currentUser._id)
-                  ? "sky"
-                  : "default"
+              className="w-full cursor-pointer capitalize"
+              disabled={
+                activity.submittedUser.find((u) => u.id === currentUser._id)
+                  ?.attempt >= 3
               }
+              onClick={() => takeQuiz(activity._id)}
+              variant="sky"
             >
-              {activity.submittedUser.includes(currentUser._id)
+              {activity.submittedUser.find((u) => u.id === currentUser._id)
+                ?.attempt >= 3
                 ? "Completed"
-                : "Take Quiz"}
+                : `Take ${activity.type}`}
             </Button>
           )}
         </CardFooter>

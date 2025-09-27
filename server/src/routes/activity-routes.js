@@ -4,7 +4,7 @@ const controller = require('../controller/activity.controller')
 const authenticateToken = require('../middlewares/authenticate')
 const { storage } = require('../lib/cloudinary')
 const multer = require('multer')
-const upload = multer({ storage }) 
+const upload = multer({ storage })
 
 router.post('/activity/add', upload.any(), authenticateToken, controller.add)
 router.get('/activity/get', authenticateToken, controller.get)
@@ -14,5 +14,6 @@ router.post('/activity/add-answer', authenticateToken, controller.addAnswer)
 router.get('/activity/count-dashboard', authenticateToken, controller.CountDashboard)
 router.delete('/activity/delete/:id', authenticateToken, controller.delete)
 router.get('/activity/get-answers/:id', authenticateToken, controller.getAnswers)
+router.get('/activity/result/:id', authenticateToken, controller.getAnswersById)
 
 module.exports = router

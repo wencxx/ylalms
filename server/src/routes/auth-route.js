@@ -9,5 +9,6 @@ router.get('/auth/get-user', authenticateToken, controller.getUser)
 router.get('/auth/get-specific-user/:id', authenticateToken, controller.getSpecificUser)
 router.get('/auth/get-all-users', authenticateToken, controller.getAllUsers)
 router.delete('/auth/delete/:id', authenticateToken, controller.deleteUser)
+router.get('/auth/total-grades', controller.usersGrades)
 
 module.exports = router

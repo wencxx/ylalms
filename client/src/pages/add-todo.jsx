@@ -12,7 +12,7 @@ function AddTodoPage() {
   const [searchParams] = useSearchParams();
   const activity = searchParams.get("q");
 
-  // navigate back to activites if no query found
+  // navigate back to todo if no query found
   useEffect(() => {
     if (!activity) {
       return navigate("/todo");
@@ -34,7 +34,7 @@ function AddTodoPage() {
         ) : activity === "identification" ? (
           <AddIdentification />
         ) : (
-          <h1>Activity not found</h1>
+          <h1>Todo not found</h1>
         )}
       </Card>
     </>

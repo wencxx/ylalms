@@ -30,6 +30,11 @@ const data = {
       emoji: "🧒",
     },
     {
+      name: "Grades",
+      url: "/grades",
+      emoji: "📝",
+    },
+    {
       name: "Activities",
       url: "/activities",
       emoji: "✍️",

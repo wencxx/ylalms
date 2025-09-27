@@ -7,11 +7,14 @@ import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 function AddIdentification() {
   const [activityName, setActivityName] = useState("");
   const [activityDescription, setActivityDescription] = useState("");
   const [dueDate, setDueDate] = useState(null);
+
+  const navigate = useNavigate()
 
   const [items, setItems] = useState([
     {
@@ -106,7 +109,6 @@ function AddIdentification() {
       toast.success("Activity todo successfully!");
       navigate("/todo");
     } catch (err) {
-      console.error(err);
       toast.error("Failed to add activity");
     } finally {
       setAdding(false);

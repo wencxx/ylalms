@@ -11,6 +11,7 @@ export function QuizResultDialog({
   onClose,
   isPassed,
   score,
+  activityType,
   totalQuestions = 10,
 }) {
   const [isConfettiShown, setIsConfettiShown] = useState(false);
@@ -77,12 +78,12 @@ export function QuizResultDialog({
               </p>
 
               <div className="flex justify-center gap-4">
-                <Link to="/activities">
+                <Link to={`/${activityType === 'activity' ? 'activities' : 'todo'}`}>
                   <Button
                     onClick={onClose}
-                    className="bg-orange-500 hover:bg-orange-600 text-white rounded-full px-6 py-2 text-lg"
+                    className="bg-orange-500 hover:bg-orange-600 text-white rounded-full px-6 py-2 text-lg capitalize"
                   >
-                    Other Activities
+                    Other {activityType}
                   </Button>
                 </Link>
               </div>
@@ -132,12 +133,12 @@ export function QuizResultDialog({
               </p>
 
               <div className="flex justify-center gap-4">
-                <Link to="/activities">
+                <Link to={`/${activityType === 'activity' ? 'activities' : 'todo'}`}>
                   <Button
                     onClick={onClose}
-                    className="bg-orange-500 hover:bg-orange-600 text-white rounded-full px-6 py-2 text-lg"
+                    className="bg-orange-500 hover:bg-orange-600 text-white rounded-full px-6 py-2 text-lg capitalize"
                   >
-                    Other Activities
+                    Other {activityType}
                   </Button>
                 </Link>
               </div>

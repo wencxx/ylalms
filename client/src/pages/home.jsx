@@ -1,7 +1,7 @@
 import DashboardCard from "@/components/dashboard/card";
 import Chart from "@/components/dashboard/chart";
 import axios from "axios";
-import { BookOpen, GraduationCap, Mars, Users, Venus } from "lucide-react";
+import { BookOpen, GraduationCap, Mars } from "lucide-react";
 import { useEffect, useState } from "react";
 
 function HomPage() {
@@ -10,6 +10,8 @@ function HomPage() {
     totalMale: 0,
     totalFemale: 0,
     totalActivities: 0,
+    totalTodo: 0,
+    chartData: {},
   });
 
   const fetchCount = async () => {
@@ -22,8 +24,7 @@ function HomPage() {
           },
         }
       );
-
-      setCounts(res.data)
+      setCounts(res.data);
     } catch (error) {
       console.log(error);
     }
@@ -40,31 +41,27 @@ function HomPage() {
       icon: <GraduationCap />,
     },
     {
-      title: "Total Male Students",
-      value: counts.totalMale,
-      icon: <Mars />,
-    },
-    {
-      title: "Total Female Students",
-      value: counts.totalFemale,
-      icon: <Venus />,
-    },
-    {
       title: "Total Activities",
       value: counts.totalActivities,
+      icon: <BookOpen />,
+    },
+    {
+      title: "Total Todo's",
+      value: counts.totalTodo,
       icon: <BookOpen />,
     },
   ];
   return (
     <>
       <div className="space-y-4">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {cardData.map((card, index) => (
             <DashboardCard key={index} {...card} />
           ))}
         </div>
-        <div>
-          <Chart />
+        <div className="space-y-4">
+          <Chart chartData={counts.chartData.todo} type="todo" />
+          <Chart chartData={counts.chartData.activity} type="activities" />
         </div>
       </div>
     </>

@@ -66,6 +66,22 @@ function AddStudent({ setStudents, setOpenDialog }) {
     }
   };
 
+  const today = new Date();
+  const minDate = new Date(
+    today.getFullYear() - 6,
+    today.getMonth(),
+    today.getDate()
+  )
+    .toISOString()
+    .split("T")[0];
+  const maxDate = new Date(
+    today.getFullYear() - 3,
+    today.getMonth(),
+    today.getDate()
+  )
+    .toISOString()
+    .split("T")[0];
+
   return (
     <>
       <form onSubmit={AddStudent} className="grid grid-cols-2 gap-2">
@@ -103,6 +119,8 @@ function AddStudent({ setStudents, setOpenDialog }) {
             type="date"
             className="border border-violet-300"
             name="birthday"
+            min={minDate}
+            max={maxDate}
           />
         </div>
         <div className="space-y-1 col-span-2">
@@ -115,7 +133,11 @@ function AddStudent({ setStudents, setOpenDialog }) {
         </div>
         <div className="space-y-1">
           <Label>Guardian Contact</Label>
-          <Input type="number" className="border border-violet-300" name="guardianContact" />
+          <Input
+            type="number"
+            className="border border-violet-300"
+            name="guardianContact"
+          />
         </div>
         <div className="space-y-1">
           <Label>Username</Label>
@@ -123,7 +145,11 @@ function AddStudent({ setStudents, setOpenDialog }) {
         </div>
         <div className="space-y-1">
           <Label>Password</Label>
-          <Input type="password" className="border border-violet-300" name="password" />
+          <Input
+            type="password"
+            className="border border-violet-300"
+            name="password"
+          />
         </div>
         <div className="col-span-full flex justify-end mt-2">
           <Button
