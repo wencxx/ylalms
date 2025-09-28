@@ -137,6 +137,11 @@ function AddStudent({ setStudents, setOpenDialog }) {
             type="number"
             className="border border-violet-300"
             name="guardianContact"
+            onInput={(e) => {
+              if (e.target.value.length > 11) {
+                e.target.value = e.target.value.slice(0, 11);
+              }
+            }}
           />
         </div>
         <div className="space-y-1">

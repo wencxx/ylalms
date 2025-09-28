@@ -27,7 +27,6 @@ export default function QuizResultPage() {
             validateStatus: (status) => status < 500,
           }
         );
-        console.log(res.data);
         if (res.status === 200) {
           setResult(res.data);
         } else {
