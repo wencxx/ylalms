@@ -16,6 +16,7 @@ import {
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const colors = [
   "bg-red-400",
@@ -65,16 +66,42 @@ function AddDragAndDrop() {
   // add item
   const [item, setItem] = useState("");
   const [belongTo, setBelongsTo] = useState("");
+  const [isAddImage, SetIsAddImage] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [preview, setPreview] = useState("");
+
+  const handleImageChange = (file) => {
+    setImageFile(file);
+    setPreview(URL.createObjectURL(file));
+  };
 
   const addItem = () => {
+    if (!belongTo) return alert("Select a container first.");
+
+    if (isAddImage && !imageFile) {
+      return alert("Please select an image.");
+    }
+
+    if (!isAddImage && !item.trim()) {
+      return alert("Please enter text for the item.");
+    }
+
+    const newItem = isAddImage
+      ? { type: "image", file: imageFile, preview }
+      : { type: "text", content: item };
+
     setContainer((prevContainers) =>
       prevContainers.map((container) =>
         container.container === belongTo
-          ? { ...container, items: [...container.items, item] }
+          ? { ...container, items: [...container.items, newItem] }
           : container
       )
     );
+
+    // clear inputs
     setItem("");
+    setImageFile(null);
+    setPreview("");
     setBelongsTo("");
   };
 
@@ -92,22 +119,41 @@ function AddDragAndDrop() {
   const navigate = useNavigate();
 
   const addActivity = async () => {
-    const newActivity = {
-      activityName,
-      dueDate,
-      type: 'todo',
-      activityType: "dnd",
-      activityDescription,
-      items: [...containers],
-    };
+    const formData = new FormData();
+    formData.append("activityName", activityName);
+    formData.append("activityType", "dnd");
+    formData.append("activityDescription", activityDescription);
+    formData.append("dueDate", dueDate);
+    formData.append("type", "todo");
+
+    // serialize containers (for text items)
+    const serialized = containers.map((c) => ({
+      container: c.container,
+      items: c.items.map((i, idx) => {
+        if (i.type === "text") return { type: "text", content: i.content };
+        return { type: "image", index: `${c.container}_${idx}` };
+      }),
+    }));
+
+    formData.append("containers", JSON.stringify(serialized));
+
+    // append actual images
+    containers.forEach((c) => {
+      c.items.forEach((i, idx) => {
+        if (i.type === "image" && i.file) {
+          formData.append(`${c.container}_${idx}`, i.file);
+        }
+      });
+    });
 
     try {
-      setAdding(true);
+      setAdding(true);  
       const res = await axios.post(
         `${import.meta.env.VITE_ENDPOINT}api/activity/add`,
-        newActivity,
+        formData,
         {
           headers: {
+            "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           validateStatus: (status) => status < 500,
@@ -210,13 +256,41 @@ function AddDragAndDrop() {
         <div className="space-y-4">
           <div className="flex flex-col lg:flex-row gap-3">
             <div className="space-y-2 w-full lg:w-1/2">
-              <Label className="text-md">Item</Label>
-              <Input
-                className="border-purple-500 bg-white"
-                placeholder="e.g., Dog"
-                value={item}
-                onChange={(e) => setItem(e.target.value)}
-              />
+              <div className="flex justify-between items-center">
+                <Label className="text-md">Item</Label>
+                <div className="flex items-center gap-x-3">
+                  <Label>Add image</Label>
+                  <Checkbox
+                    className="border-black"
+                    checked={isAddImage}
+                    onCheckedChange={(checked) => SetIsAddImage(!!checked)}
+                  />
+                </div>
+              </div>
+              {isAddImage ? (
+                <>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    className="border-purple-500 bg-white"
+                    onChange={(e) => handleImageChange(e.target.files[0])}
+                  />
+                  {preview && (
+                    <img
+                      src={preview}
+                      alt="preview"
+                      className="w-32 h-32 object-cover rounded-md border"
+                    />
+                  )}
+                </>
+              ) : (
+                <Input
+                  className="border-purple-500 bg-white"
+                  placeholder="e.g., Dog"
+                  value={item}
+                  onChange={(e) => setItem(e.target.value)}
+                />
+              )}
             </div>
             <div className="space-y-2 w-full lg:w-1/2">
               <Label className="text-md">Belongs to</Label>
@@ -263,9 +337,19 @@ function AddDragAndDrop() {
                       className={`${colorMap[index]} p-2 rounded text-white`}
                     >
                       <h4>{container.container}</h4>
-                      <ul className="list-disc pl-4">
-                        {container.items.map((item, index) => (
-                          <li key={index}>{item}</li>
+                      <ul className="list-disc pl-4 space-y-1">
+                        {container.items.map((item, idx) => (
+                          <li key={idx} className="flex items-center gap-2">
+                            {item.type === "image" ? (
+                              <img
+                                src={item.preview}
+                                alt="item"
+                                className="w-12 h-12 object-cover rounded border"
+                              />
+                            ) : (
+                              <span>{item.content}</span>
+                            )}
+                          </li>
                         ))}
                       </ul>
                     </div>
@@ -276,7 +360,7 @@ function AddDragAndDrop() {
               className={`w-full mt-2 ${adding && "animate-pulse"}`}
               onClick={() => addActivity()}
             >
-              {adding ? "Adding activity" : "Add Activity"}
+              {adding ? "Adding todo" : "Add todo"}
             </Button>
           </div>
         ) : (

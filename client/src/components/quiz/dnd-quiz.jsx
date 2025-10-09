@@ -4,10 +4,12 @@ import { DndContext, useDraggable, useDroppable } from "@dnd-kit/core";
 import { motion, AnimatePresence } from "framer-motion";
 
 const generateDraggables = (items) =>
-  items.flatMap((group) =>
+  items.flatMap((group, gIdx) =>
     group.items.map((item, index) => ({
-      id: `${item}-${index}`,
-      label: item,
+      id: `${gIdx}-${index}`,
+      type: item.type,
+      label: item.content || null,
+      imageUrl: item.imageUrl || null,
       correctContainer: group.container,
     }))
   );
@@ -25,7 +27,9 @@ function DndQuizMain({
   const [draggables] = useState(generateDraggables(data.items));
   const [correctList, setCorrectList] = useState([]);
   const [wrongList, setWrongList] = useState([]);
+  const [containers] = useState(data.items.map((i) => i.container));
 
+  // initialize counters
   useEffect(() => {
     setItems(draggables.length);
   }, [draggables]);
@@ -33,11 +37,7 @@ function DndQuizMain({
   useEffect(() => {
     setCorrectAnswers(correctList);
     setWrongAnswers(wrongList);
-  }, [correctList, wrongList, setCorrectAnswers, setWrongAnswers]);
-
-  const [containers, setContainers] = useState(
-    data.items.map((item) => item.container)
-  );
+  }, [correctList, wrongList]);
 
   const handleDragEnd = (event) => {
     const { active, over } = event;
@@ -75,7 +75,13 @@ function DndQuizMain({
           {draggables
             .filter((item) => !(item.id in droppedItems))
             .map((item) => (
-              <DraggableItem key={item.id} id={item.id} label={item.label} />
+              <DraggableItem
+                key={item.id}
+                id={item.id}
+                label={item.label}
+                type={item.type}
+                imageUrl={item.imageUrl}
+              />
             ))}
         </div>
 
@@ -96,29 +102,37 @@ function DndQuizMain({
   );
 }
 
-function DraggableItem({ id, label }) {
+function DraggableItem({ id, label, type, imageUrl }) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({ id });
 
   const style = {
     transform: transform
       ? `translate(${transform.x}px, ${transform.y}px)`
       : undefined,
-    padding: "10px 20px",
-    color: "white",
-    borderRadius: "6px",
     cursor: "grab",
-    marginBottom: "10px",
   };
 
   return (
     <div
       ref={setNodeRef}
-      style={style}
       {...listeners}
       {...attributes}
-      className="bg-rose-500"
+      style={style}
+      className="p-2 mb-2 bg-rose-500 text-white rounded-md shadow-md"
     >
-      {label}
+      {type === "image" ? (
+        <img
+          src={
+            imageUrl?.startsWith("http")
+              ? imageUrl
+              : `${import.meta.env.VITE_API_URL}/${imageUrl}`
+          }
+          alt="drag-item"
+          className="w-16 h-16 object-cover rounded-md"
+        />
+      ) : (
+        <span>{label}</span>
+      )}
     </div>
   );
 }
@@ -132,24 +146,31 @@ function DroppableZone({ id, label, droppedItems, draggables, colors }) {
 
   const backgroundColor = useMemo(() => {
     const randomIndex = Math.floor(Math.random() * colors.length);
-
     return colors[randomIndex];
   }, [id]);
 
   return (
     <div
       ref={setNodeRef}
-      className={`min-h-[120px] p-4 border-2 rounded-md transition-colors ${backgroundColor} ${
+      className={`min-h-[140px] p-4 border-2 rounded-md transition-colors ${backgroundColor} ${
         isOver ? "border-green-500 bg-green-100" : "border-gray-300"
       }`}
     >
-      <h2 className="font-semibold text-lg mb-2">{label}</h2>
+      <h2 className="font-semibold text-lg mb-2 text-white drop-shadow">
+        {label}
+      </h2>
       <div className="flex flex-wrap gap-2">
         {itemsHere.map((itemId) => {
           const item = draggables.find((d) => d.id === itemId);
           return (
             item && (
-              <DraggableItem key={item.id} id={item.id} label={item.label} />
+              <DraggableItem
+                key={item.id}
+                id={item.id}
+                label={item.label}
+                type={item.type}
+                imageUrl={item.imageUrl}
+              />
             )
           );
         })}
@@ -202,10 +223,14 @@ export default function DndQuiz(props) {
               </div>
               <div className="flex gap-x-2 mb-5 h-40">
                 <div className="border w-1/2 pl-2">
-                  <p className="text-start font-semibold text-neutral-600">Animals</p>
+                  <p className="text-start font-semibold text-neutral-600">
+                    Animals
+                  </p>
                 </div>
                 <div className="border w-1/2 pl-2">
-                  <p className="text-start font-semibold text-neutral-600">Shapes</p>
+                  <p className="text-start font-semibold text-neutral-600">
+                    Shapes
+                  </p>
                 </div>
               </div>
 

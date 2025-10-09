@@ -4,15 +4,39 @@ const User = require('../models/user')
 
 exports.add = async (req, res) => {
     try {
-        const { activityName, activityDescription, activityType, type, dueDate, items } = req.body;
+        const { activityName, activityDescription, activityType, type, dueDate } = req.body;
 
-        if (!activityName || !activityDescription || !items) {
+        // Step 1: Validate text fields first
+        if (!activityName || !activityDescription) {
             return res.status(400).json({ error: "Missing required fields." });
         }
 
+        // Step 2: Handle items (or containers) as JSON strings from FormData
+        let items = req.body.items;
+
+        // Some of your frontend code uses "containers" instead of "items"
+        if (!items && req.body.containers) {
+            items = req.body.containers;
+        }
+
+        // Parse JSON if it's a string
+        if (typeof items === "string") {
+            try {
+                items = JSON.parse(items);
+            } catch (err) {
+                console.error("Invalid JSON in items/containers:", err);
+                return res.status(400).json({ error: "Invalid JSON format for items/containers." });
+            }
+        }
+
+        if (!items || !Array.isArray(items)) {
+            return res.status(400).json({ error: "Missing or invalid items array." });
+        }
+
+
         let enrichedItems;
 
-        if (req.files) {
+        if (req.files && activityType === 'identification') {
             enrichedItems = items.map((item, idx) => {
                 // Find a matching image file for this item, if any
                 const file = req.files?.find((f) => f.fieldname === `items[${idx}][image]`);
@@ -23,6 +47,51 @@ exports.add = async (req, res) => {
                     correctAnswer: item.correctAnswer,
                     imageOriginalName: file?.originalname || null,
                     imageUrl: file?.path || null, // or use `file.path` if using disk storage
+                };
+            });
+        } else if (req.files && activityType === 'dnd') {
+            enrichedItems = items.map((container) => {
+                const enrichedContainer = {
+                    container: container.container,
+                    items: container.items.map((item) => {
+                        if (item.type === "image") {
+                            const file = req.files.find((f) => f.fieldname === item.index);
+                            return {
+                                type: "image",
+                                imageOriginalName: file?.originalname || null,
+                                imageUrl: file?.path || null,
+                            };
+                        } else {
+                            return {
+                                type: "text",
+                                content: item.content,
+                            };
+                        }
+                    }),
+                };
+                return enrichedContainer;
+            });
+        } else if (req.files && activityType === 'matching') {
+            enrichedItems = items.map((pair, idx) => {
+                const leftFile = req.files.find((f) => f.fieldname === `left_${idx}`);
+                const rightFile = req.files.find((f) => f.fieldname === `right_${idx}`);
+
+                return {
+                    id: pair.id,
+                    leftItem: pair.leftItem.type === "image"
+                        ? {
+                            type: "image",
+                            imageOriginalName: leftFile?.originalname || null,
+                            imageUrl: leftFile?.path || null,
+                        }
+                        : { type: "text", content: pair.leftItem.content },
+                    rightItem: pair.rightItem.type === "image"
+                        ? {
+                            type: "image",
+                            imageOriginalName: rightFile?.originalname || null,
+                            imageUrl: rightFile?.path || null,
+                        }
+                        : { type: "text", content: pair.rightItem.content },
                 };
             });
         } else {

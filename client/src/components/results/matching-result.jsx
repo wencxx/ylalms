@@ -72,6 +72,19 @@ export default function MatchingQuizResult({
     });
   };
 
+  const renderItemContent = (item) => {
+    if (item.type === "image") {
+      return (
+        <img
+          src={item.imageUrl}
+          alt="quiz-item"
+          className="w-16 h-16 object-cover rounded-md border"
+        />
+      );
+    }
+    return <span>{item.content}</span>;
+  };
+
   return (
     <CardContent>
       <h2 className="font-bold mb-2">Your Matches</h2>
@@ -96,7 +109,7 @@ export default function MatchingQuizResult({
                       : "bg-red-100 shadow"
                   }`}
               >
-                {item.leftItem}
+                {renderItemContent(item.leftItem)}
               </div>
             );
           })}
@@ -118,7 +131,7 @@ export default function MatchingQuizResult({
                       : "bg-green-100 shadow"
                   }`}
               >
-                {item.rightItem}
+                {renderItemContent(item.rightItem)}
               </div>
             );
           })}

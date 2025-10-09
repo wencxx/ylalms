@@ -142,13 +142,26 @@ function MatchingQuizMain({
     });
   };
 
+  const renderItemContent = (item) => {
+    if (item.type === "image") {
+      return (
+        <img
+          src={item.imageUrl}
+          alt="quiz-item"
+          className="w-16 h-16 object-cover rounded-md border"
+        />
+      );
+    }
+    return <span>{item.content}</span>;
+  };
+
   return (
     <CardContent>
       <div
         className="relative flex justify-between h-fit mb-6"
         ref={containerRef}
       >
-        {/* lep kolom */}
+        {/* Left Column */}
         <div className="flex flex-col gap-4 w-2/5">
           {leftItems.map((item) => (
             <div
@@ -164,12 +177,12 @@ function MatchingQuizMain({
                 }`}
               onClick={() => handleLeftSelect(item)}
             >
-              {item.leftItem}
+              {renderItemContent(item.leftItem)}
             </div>
           ))}
         </div>
 
-        {/* rayt kolom */}
+        {/* Right Column */}
         <div className="flex flex-col gap-4 w-2/5">
           {rightItems.map((item) => (
             <div
@@ -185,12 +198,12 @@ function MatchingQuizMain({
                 }`}
               onClick={() => handleRightSelect(item)}
             >
-              {item.rightItem}
+              {renderItemContent(item.rightItem)}
             </div>
           ))}
         </div>
 
-        {/* the greaaaaaat line HAHA */}
+        {/* Lines */}
         <svg className="absolute top-0 left-0 w-full h-full pointer-events-none z-10">
           {renderLines()}
         </svg>

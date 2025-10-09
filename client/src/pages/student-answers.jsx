@@ -32,6 +32,8 @@ export default function StudentAnswers() {
         }
       );
 
+      console.log(res.data)
+
       if (res.status === 200) {
         setQuizResults(res.data);
       }
@@ -81,7 +83,7 @@ export default function StudentAnswers() {
               <CardHeader className="bg-gradient-to-r from-blue-100 to-cyan-100 pt-2">
                 <div className="flex justify-between items-center">
                   <p className="text-xl font-bold text-blue-700 flex items-center gap-2 capitalize">
-                    {quizResults.quizId.type} -{" "}
+                    {quizResults.quizId?.type} - {" "}
                     {quizResults.quizId?.activityName}
                   </p>
                   <div className="bg-yellow-100 rounded-full p-2 flex items-center justify-center">
@@ -94,10 +96,10 @@ export default function StudentAnswers() {
                   <div className="flex flex-col items-center p-3 bg-blue-50 rounded-lg">
                     <BookOpen className="h-5 w-5 text-blue-500 mb-1" />
                     <p className="text-sm text-gray-500 capitalize">
-                      {quizResults.quizId.type} Type
+                      {quizResults.quizId?.type} Type
                     </p>
                     <p className="font-medium text-blue-700 capitalize">
-                      {quizResults.quizId.activityType}
+                      {quizResults.quizId?.activityType}
                     </p>
                   </div>
                   <div className="flex flex-col items-center p-3 bg-green-50 rounded-lg">

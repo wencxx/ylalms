@@ -225,7 +225,7 @@ function AddIdentification() {
             type="submit"
             className={`w-full mt-2 ${adding && "animate-pulse"}`}
           >
-            {adding ? "Adding activity" : "Add activity"}
+            {adding ? "Adding todo" : "Add todo"}
           </Button>
         </div>
       </CardContent>

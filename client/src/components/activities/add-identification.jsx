@@ -7,6 +7,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 function AddIdentification() {
   const [activityName, setActivityName] = useState("");
@@ -19,7 +20,9 @@ function AddIdentification() {
       correctAnswer: 0,
     },
   ]);
-
+  
+  const navigate = useNavigate()
+  
   const handleItemChange = (idx, field, value) => {
     const updated = [...items];
     updated[idx][field] = value;
@@ -100,6 +103,7 @@ function AddIdentification() {
         },
       ]);
       toast.success("Activity added successfully!");
+      navigate("/activities");
     } catch (err) {
       console.error(err);
       toast.error("Failed to add activity");
