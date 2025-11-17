@@ -200,7 +200,7 @@ export default function StudentsPage() {
                     </td>
                     <td className="py-2 px-4">
                       <div className="flex flex-col">
-                        <span className="text-sm font-medium">{student.percentage ? student.percentage : '0' }%</span>
+                        <span className="text-sm font-medium">{student.percentage ? Math.round(student.percentage) : '0' }%</span>
                         <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
                           <div
                             className="h-2.5 rounded-full bg-pink-500"
