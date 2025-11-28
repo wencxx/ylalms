@@ -8,5 +8,6 @@ app.use(cors())
 
 app.use('/api', require('./src/routes/activity-routes'))
 app.use('/api', require('./src/routes/auth-route'))
+app.use('/api', require('./src/routes/notification-routes'))
 
 module.exports = app

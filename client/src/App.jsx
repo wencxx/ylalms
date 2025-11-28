@@ -15,7 +15,6 @@ import QuizResultPage from "@/pages/quiz-result";
 import GradesPage from "./pages/grades";
 
 function App() {
-  
   const router = createBrowserRouter([
     {
       path: "/login",
@@ -24,7 +23,7 @@ function App() {
     {
       path: "/",
       element: (
-        <ProtectedRoutes allowedRules={['teacher']}>
+        <ProtectedRoutes allowedRules={["teacher"]}>
           <LayoutPage />
         </ProtectedRoutes>
       ),
@@ -56,13 +55,13 @@ function App() {
         {
           path: "profile/:id",
           element: <ProfilePage />,
-        }
+        },
       ],
     },
     {
       path: "/",
       element: (
-        <ProtectedRoutes allowedRules={['student', 'teacher']}>
+        <ProtectedRoutes allowedRules={["student", "teacher"]}>
           <LayoutPage />
         </ProtectedRoutes>
       ),
@@ -86,7 +85,7 @@ function App() {
         {
           path: "profile",
           element: <ProfilePage />,
-        }
+        },
       ],
     },
   ]);

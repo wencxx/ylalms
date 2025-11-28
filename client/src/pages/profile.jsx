@@ -2,13 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
-import {
-  BookOpen,
-  Calendar,
-  Venus,
-  Mars,
-  LineChart,
-} from "lucide-react";
+import { BookOpen, Calendar, Venus, Mars, LineChart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -62,9 +56,17 @@ function ProfilePage() {
   if (!student) return <div>Loading...</div>;
 
   const attempts = (submittedUsers) => {
+    if (!submittedUsers || submittedUsers.length === 0) {
+      return "0/3";
+    }
+
     const currentUserAttempts = submittedUsers.find(
       (c) => String(c.id) == studentID
     );
+
+    if (!currentUserAttempts || currentUserAttempts.attempt === undefined) {
+      return "0/3";
+    }
 
     return `${currentUserAttempts.attempt}/3`;
   };
