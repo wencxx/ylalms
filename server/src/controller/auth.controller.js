@@ -78,7 +78,8 @@ exports.getUser = async (req, res) => {
 exports.getAllUsers = async (req, res) => {
     try {
         const users = await User.find({
-            role: 'student'
+            role: 'student',
+            status: { $ne: 'archived' }
         }).lean()
 
         if (!users.length) return res.status(404).send('Users not found')
@@ -210,6 +211,48 @@ exports.usersGrades = async (req, res) => {
 
 
         res.status(200).send(usersWithGrades)
+    } catch (error) {
+        console.log(error)
+        res.status(500).send('Server error')
+    }
+}
+
+exports.archiveAllStudents = async (req, res) => {
+    try {
+        await User.updateMany({ role: 'student' }, { status: 'archived' })
+        res.status(200).send('All students archived successfully')
+    } catch (error) {
+        console.log(error)
+        res.status(500).send('Server error')
+    }
+}
+
+exports.getArchivedUsers = async (req, res) => {
+    try {
+        const users = await User.find({
+            role: 'student',
+            status: 'archived'
+        }).lean()
+
+        if (!users.length) return res.status(404).send('No archived students found')
+
+        const totalActivities = await Activity.countDocuments()
+
+        const usersWithPercentage = []
+
+        for (const user of users) {
+            const userAnswer = await Answer.find({ userId: user._id })
+
+            const quizIds = userAnswer.map(a => a.quizId.toString())
+
+            const uniqueIds = new Set(quizIds)
+
+            const percentage = (uniqueIds.size / totalActivities) * 100
+
+            usersWithPercentage.push({ ...user, percentage })
+        }
+
+        res.status(200).send(usersWithPercentage)
     } catch (error) {
         console.log(error)
         res.status(500).send('Server error')

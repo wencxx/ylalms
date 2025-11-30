@@ -48,6 +48,10 @@ const userSchema = new mongoose.Schema({
         required: true,
         default: 'student'
     },
+    status: {
+        type: String,
+        default: 'active'
+    },
 }, {
     timestamps: true
 })

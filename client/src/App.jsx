@@ -13,6 +13,7 @@ import StudentAnswers from "@/pages/student-answers";
 import ProfilePage from "@/pages/profile";
 import QuizResultPage from "@/pages/quiz-result";
 import GradesPage from "./pages/grades";
+import ArchivedStudentsPage from "@/pages/archived-students";
 
 function App() {
   const router = createBrowserRouter([
@@ -39,6 +40,10 @@ function App() {
         {
           path: "grades",
           element: <GradesPage />,
+        },
+        {
+          path: "archived-students",
+          element: <ArchivedStudentsPage />,
         },
         {
           path: "add-activity",

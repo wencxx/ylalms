@@ -113,6 +113,36 @@ export default function StudentsPage() {
     }
   };
 
+  // archive students
+  const [showArchiveDialog, setShowArchiveDialog] = useState(false);
+
+  const archiveAllStudents = async () => {
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_ENDPOINT}api/auth/archive-all`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          validateStatus: (status) => status < 500,
+        }
+      );
+
+      if (res.status === 200) {
+        toast.success("All students archived successfully.");
+        setStudents([]);
+      } else {
+        toast.error(res.data);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to archive students.");
+    } finally {
+      setShowArchiveDialog(false);
+    }
+  };
+
   return (
     <>
       <div className="bg-gradient-to-r from-pink-100 via-purple-100 to-blue-100 rounded-xl p-6 mb-8">
@@ -136,18 +166,23 @@ export default function StudentsPage() {
             onChange={(e) => setFilter(e.target.value)}
           />
         </div>
-        <div className="flex gap-2 w-full md:w-auto">
+        <div className="flex gap-2 w-full md:w-auto flex-wrap justify-end">
+          <Link to="/archived-students">
+            <Button
+              variant="outline"
+              className="border-purple-300 text-purple-700"
+            >
+              Archived Students
+            </Button>
+          </Link>
           <Button
-            onClick={() => setOpenDialog(true)}
+            variant="destructive"
+            onClick={() => setShowArchiveDialog(true)}
+            disabled={students.length === 0}
           >
-            Add Student
+            Archive All Students
           </Button>
-          {/* <Button
-            variant="outline"
-            className="border-purple-300 text-purple-700"
-          >
-            Export List
-          </Button> */}
+          <Button onClick={() => setOpenDialog(true)}>Add Student</Button>
         </div>
       </div>
 
@@ -200,11 +235,20 @@ export default function StudentsPage() {
                     </td>
                     <td className="py-2 px-4">
                       <div className="flex flex-col">
-                        <span className="text-sm font-medium">{student.percentage ? Math.round(student.percentage) : '0' }%</span>
+                        <span className="text-sm font-medium">
+                          {student.percentage
+                            ? Math.round(student.percentage)
+                            : "0"}
+                          %
+                        </span>
                         <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
                           <div
                             className="h-2.5 rounded-full bg-pink-500"
-                            style={{ width: `${ student.percentage ? student.percentage : 0}%` }}
+                            style={{
+                              width: `${
+                                student.percentage ? student.percentage : 0
+                              }%`,
+                            }}
                           ></div>
                         </div>
                       </div>
@@ -278,6 +322,27 @@ export default function StudentsPage() {
               onClick={() => confirmDelete()}
             >
               Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showArchiveDialog} onOpenChange={setShowArchiveDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Archive All Students?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action will move all current students to the archived list.
+              They will no longer appear on this page.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-orange-500 hover:bg-orange-600"
+              onClick={() => archiveAllStudents()}
+            >
+              Archive All
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
