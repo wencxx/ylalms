@@ -111,6 +111,23 @@ export default function TakeQuizPage() {
       droppedItems, // <-- include droppedItems in submission
     };
 
+    // Validation: Ensure all questions are answered
+    if (activity.activityType === "dnd") {
+      // For DnD, check if the number of dropped items matches the total number of draggable items
+      // Note: This assumes 1-to-1 mapping or that 'items' count reflects total required drops.
+      // Based on dnd-quiz.jsx, 'items' is set to draggables.length.
+      if (Object.keys(droppedItems).length < items) {
+        toast.warning("Please answer all questions before submitting.");
+        return;
+      }
+    } else {
+      // For Identification and Matching, check if total answers (correct + wrong) equals total items
+      if (correctAnswers.length + wrongAnswers.length < items) {
+        toast.warning("Please answer all questions before submitting.");
+        return;
+      }
+    }
+
     try {
       setSubmitting(true);
       const res = await axios.post(

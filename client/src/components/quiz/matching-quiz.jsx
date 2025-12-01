@@ -215,6 +215,33 @@ function MatchingQuizMain({
 export default function MatchingQuiz(props) {
   const [showIntro, setShowIntro] = useState(true);
 
+  // Find a sample image if available
+  const sampleImageItem = props.data?.find(
+    (item) => item.leftItem.type === "image" || item.rightItem.type === "image"
+  );
+
+  const leftContent =
+    sampleImageItem?.leftItem.type === "image" ? (
+      <img
+        src={sampleImageItem.leftItem.imageUrl}
+        alt="demo"
+        className="w-8 h-8 object-cover rounded-sm"
+      />
+    ) : (
+      "Apple"
+    );
+
+  const rightContent =
+    sampleImageItem?.rightItem.type === "image" ? (
+      <img
+        src={sampleImageItem.rightItem.imageUrl}
+        alt="demo"
+        className="w-8 h-8 object-cover rounded-sm"
+      />
+    ) : (
+      "Fruit"
+    );
+
   return (
     <CardContent>
       <AnimatePresence>
@@ -240,8 +267,12 @@ export default function MatchingQuiz(props) {
 
               {/* Demo: fake pair with animated line */}
               <div className="flex justify-between relative mb-6 px-6">
-                <div className="p-3 bg-red-100 rounded shadow">Apple</div>
-                <div className="p-3 bg-green-100 rounded shadow">Fruit</div>
+                <div className="p-3 bg-red-100 rounded shadow">
+                  {leftContent}
+                </div>
+                <div className="p-3 bg-green-100 rounded shadow">
+                  {rightContent}
+                </div>
 
                 <motion.svg
                   className="absolute left-0 w-full h-8"

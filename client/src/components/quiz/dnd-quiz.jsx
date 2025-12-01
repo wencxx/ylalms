@@ -182,6 +182,11 @@ function DroppableZone({ id, label, droppedItems, draggables, colors }) {
 export default function DndQuiz(props) {
   const [showIntro, setShowIntro] = useState(true);
 
+  // Find a sample image if available
+  const sampleImageItem = props.data?.items
+    ?.flatMap((group) => group.items)
+    ?.find((item) => item.imageUrl);
+
   return (
     <CardContent>
       <AnimatePresence>
@@ -211,7 +216,21 @@ export default function DndQuiz(props) {
                   animate={{ y: [0, 100, 0] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
-                  Cat
+                  {sampleImageItem ? (
+                    <img
+                      src={
+                        sampleImageItem.imageUrl.startsWith("http")
+                          ? sampleImageItem.imageUrl
+                          : `${import.meta.env.VITE_API_URL}/${
+                              sampleImageItem.imageUrl
+                            }`
+                      }
+                      alt="demo"
+                      className="w-8 h-8 object-cover rounded-sm"
+                    />
+                  ) : (
+                    "Cat"
+                  )}
                 </motion.div>
                 <motion.div
                   className="inline-block bg-rose-500 text-white px-4 py-2 rounded-md mb-6"

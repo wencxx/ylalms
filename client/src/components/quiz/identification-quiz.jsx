@@ -138,6 +138,9 @@ function IdentificationQuizMain({
 export default function IdentificationQuiz(props) {
   const [showIntro, setShowIntro] = useState(true);
 
+  // Find a sample image if available
+  const sampleImageItem = props.data?.items?.find((item) => item.imageUrl);
+
   return (
     <CardContent>
       <AnimatePresence>
@@ -163,6 +166,21 @@ export default function IdentificationQuiz(props) {
 
               {/* Demo animation */}
               <div className="text-left mb-6">
+                {sampleImageItem && (
+                  <div className="mb-4 flex justify-center">
+                    <img
+                      src={
+                        sampleImageItem.imageUrl.startsWith("http")
+                          ? sampleImageItem.imageUrl
+                          : `${import.meta.env.VITE_API_URL}/${
+                              sampleImageItem.imageUrl
+                            }`
+                      }
+                      alt="demo question"
+                      className="h-32 object-contain rounded-md"
+                    />
+                  </div>
+                )}
                 <p className="font-semibold mb-4">Which of these is a fruit?</p>
                 <div className="space-y-3">
                   {["Carrot 🥕", "Apple 🍎", "Potato 🥔", "Broccoli 🥦"].map(
