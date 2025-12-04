@@ -218,8 +218,9 @@ exports.usersGrades = async (req, res) => {
 }
 
 exports.archiveAllStudents = async (req, res) => {
+    const { schoolYear } = req.body
     try {
-        await User.updateMany({ role: 'student' }, { status: 'archived' })
+        await User.updateMany({ role: 'student' }, { status: 'archived', schoolYear })
         res.status(200).send('All students archived successfully')
     } catch (error) {
         console.log(error)
@@ -253,6 +254,28 @@ exports.getArchivedUsers = async (req, res) => {
         }
 
         res.status(200).send(usersWithPercentage)
+    } catch (error) {
+        console.log(error)
+        res.status(500).send('Server error')
+    }
+}
+
+exports.unarchiveUser = async (req, res) => {
+    const { id } = req.params
+    try {
+        await User.findByIdAndUpdate(id, { status: 'active', schoolYear: null })
+        res.status(200).send('User unarchived successfully')
+    } catch (error) {
+        console.log(error)
+        res.status(500).send('Server error')
+    }
+}
+
+exports.unarchiveBySchoolYear = async (req, res) => {
+    const { schoolYear } = req.body
+    try {
+        await User.updateMany({ role: 'student', status: 'archived', schoolYear }, { status: 'active', schoolYear: null })
+        res.status(200).send('Students unarchived successfully')
     } catch (error) {
         console.log(error)
         res.status(500).send('Server error')

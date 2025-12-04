@@ -115,12 +115,18 @@ export default function StudentsPage() {
 
   // archive students
   const [showArchiveDialog, setShowArchiveDialog] = useState(false);
+  const [schoolYear, setSchoolYear] = useState("");
 
   const archiveAllStudents = async () => {
+    if (!schoolYear) {
+      toast.error("Please enter a school year.");
+      return;
+    }
+
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_ENDPOINT}api/auth/archive-all`,
-        {},
+        { schoolYear },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -132,6 +138,7 @@ export default function StudentsPage() {
       if (res.status === 200) {
         toast.success("All students archived successfully.");
         setStudents([]);
+        setSchoolYear("");
       } else {
         toast.error(res.data);
       }
@@ -335,6 +342,17 @@ export default function StudentsPage() {
               This action will move all current students to the archived list.
               They will no longer appear on this page.
             </AlertDialogDescription>
+            <div className="mt-4">
+              <label className="text-sm font-medium text-gray-700">
+                School Year
+              </label>
+              <Input
+                placeholder="e.g. 2023-2024"
+                value={schoolYear}
+                onChange={(e) => setSchoolYear(e.target.value)}
+                className="mt-1"
+              />
+            </div>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>

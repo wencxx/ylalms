@@ -52,6 +52,9 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: 'active'
     },
+    schoolYear: {
+        type: String
+    }
 }, {
     timestamps: true
 })

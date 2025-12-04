@@ -5,6 +5,17 @@ import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function ArchivedStudentsPage() {
   const [students, setStudents] = useState([]);
@@ -34,24 +45,97 @@ export default function ArchivedStudentsPage() {
     }
   };
 
+  const unarchiveUser = async (id) => {
+    try {
+      const res = await axios.put(
+        `${import.meta.env.VITE_ENDPOINT}api/auth/unarchive/${id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          validateStatus: (status) => status < 500,
+        }
+      );
+
+      if (res.status === 200) {
+        toast.success("Student unarchived successfully.");
+        setStudents((prev) => prev.filter((student) => student._id !== id));
+      } else {
+        toast.error(res.data);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to unarchive student.");
+    }
+  };
+
+  const [showUnarchiveByYearDialog, setShowUnarchiveByYearDialog] =
+    useState(false);
+  const [unarchiveYear, setUnarchiveYear] = useState("");
+
+  const unarchiveBySchoolYear = async () => {
+    if (!unarchiveYear) {
+      toast.error("Please enter a school year.");
+      return;
+    }
+
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_ENDPOINT}api/auth/unarchive-by-year`,
+        { schoolYear: unarchiveYear },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          validateStatus: (status) => status < 500,
+        }
+      );
+
+      if (res.status === 200) {
+        toast.success("Students unarchived successfully.");
+        getArchivedStudents(); // Refresh list
+        setUnarchiveYear("");
+      } else {
+        toast.error(res.data);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to unarchive students.");
+    } finally {
+      setShowUnarchiveByYearDialog(false);
+    }
+  };
+
   useEffect(() => {
     getArchivedStudents();
   }, []);
 
   //fitler students
   const [filter, setFilter] = useState("");
+  const [schoolYearFilter, setSchoolYearFilter] = useState("");
 
   const filteredStudents = () => {
-    if (!filter) return students;
+    let filtered = students;
 
-    return students.filter((student) => {
-      const fullname = [
-        student.firstName,
-        student.middleName,
-        student.lastName,
-      ].join(" ");
-      return fullname.toLowerCase().includes(filter.toLowerCase());
-    });
+    if (filter) {
+      filtered = filtered.filter((student) => {
+        const fullname = [
+          student.firstName,
+          student.middleName,
+          student.lastName,
+        ].join(" ");
+        return fullname.toLowerCase().includes(filter.toLowerCase());
+      });
+    }
+
+    if (schoolYearFilter) {
+      filtered = filtered.filter((student) =>
+        student.schoolYear?.includes(schoolYearFilter)
+      );
+    }
+
+    return filtered;
   };
 
   return (
@@ -82,6 +166,22 @@ export default function ArchivedStudentsPage() {
             onChange={(e) => setFilter(e.target.value)}
           />
         </div>
+        <div className="flex items-center gap-2">
+          <div className="w-full md:w-auto lg:max-w-xs">
+            <Input
+              placeholder="Filter by School Year..."
+              className="bg-white border-2 border-gray-200 focus:border-gray-400 rounded-full"
+              onChange={(e) => setSchoolYearFilter(e.target.value)}
+            />
+          </div>
+          <Button
+            variant="outline"
+            className="border-gray-300 text-gray-700"
+            onClick={() => setShowUnarchiveByYearDialog(true)}
+          >
+            Unarchive by Year
+          </Button>
+        </div>
       </div>
 
       {!fetching ? (
@@ -93,6 +193,7 @@ export default function ArchivedStudentsPage() {
                   <th className="py-3 px-4 text-left">Avatar</th>
                   <th className="py-3 px-4 text-left">Name</th>
                   <th className="py-3 px-4 text-left">Gender</th>
+                  <th className="py-3 px-4 text-left">School Year</th>
                   <th className="py-3 px-4 text-left">Progress</th>
                   <th className="py-3 px-4 text-left">Actions</th>
                 </tr>
@@ -131,6 +232,9 @@ export default function ArchivedStudentsPage() {
                     <td className="py-2 px-4 text-gray-600">
                       {student.gender}
                     </td>
+                    <td className="py-2 px-4 text-gray-600">
+                      {student.schoolYear || "N/A"}
+                    </td>
                     <td className="py-2 px-4">
                       <div className="flex flex-col">
                         <span className="text-sm font-medium">
@@ -162,6 +266,14 @@ export default function ArchivedStudentsPage() {
                             View Results
                           </Button>
                         </Link>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-green-600"
+                          onClick={() => unarchiveUser(student._id)}
+                        >
+                          Unarchive
+                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -181,6 +293,40 @@ export default function ArchivedStudentsPage() {
           <Skeleton className="h-60 rounded-xl w-full" />
         </div>
       )}
+
+      <AlertDialog
+        open={showUnarchiveByYearDialog}
+        onOpenChange={setShowUnarchiveByYearDialog}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unarchive Students by Year</AlertDialogTitle>
+            <AlertDialogDescription>
+              Enter the school year to unarchive all students from that year.
+            </AlertDialogDescription>
+            <div className="mt-4">
+              <label className="text-sm font-medium text-gray-700">
+                School Year
+              </label>
+              <Input
+                placeholder="e.g. 2023-2024"
+                value={unarchiveYear}
+                onChange={(e) => setUnarchiveYear(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-green-600 hover:bg-green-700"
+              onClick={() => unarchiveBySchoolYear()}
+            >
+              Unarchive
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
